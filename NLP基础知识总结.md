@@ -65,7 +65,6 @@ corpus = [
 ]
 vectorizer = TfidfVectorizer()
 tfidf_matrix = vectorizer.fit_transform(corpus)
-# 得到 3×N 的矩阵，每行是一个文档的向量
 ```
 
 **本项目用在哪**：BM25 检索（关键词匹配）的背后原理就是 TF-IDF 的变体。
@@ -102,20 +101,11 @@ BM25关键词匹配 → 优先匹配"电动机""起动"（精确）
 ```python
 from sklearn.metrics.pairwise import cosine_similarity
 
-# 用户问题向量 vs 知识库中每条故障现象的向量
 similarity = cosine_similarity(user_vector, knowledge_vectors)
 # 值越接近 1 越相似
 ```
 
 **本项目用在哪**：向量检索的核心算法——计算用户问题与 Chroma 中每条故障现象描述的相似度。
-
-### 4.2 相似度方法选择指南
-
-| 文本长度 | 推荐方法 | 本项目场景 |
-|---------|---------|-----------|
-| 短文本（<50字） | BERT 句向量 | 用户输入的问题 |
-| 中等文本 | TF-IDF + 余弦 | 故障现象描述匹配 |
-| 长文本 | Doc2Vec 或分段 | 教材原文段落检索 |
 
 ---
 
@@ -183,6 +173,6 @@ similarity = cosine_similarity(user_vector, knowledge_vectors)
 ## 八、关键原则
 
 1. **中文分词必须先做**：用户输入不经过分词直接检索，匹配率断崖下降
-2. **混合检索优于单一方法**：BM25 保证精确匹配（"电动机"就是"电动机"），向量保证语义匹配（"冒烟"≈"过热烧损"）
+2. **混合检索优于单一方法**：BM25 保证精确匹配，向量保证语义匹配
 3. **向量模型选多语言版本**：`paraphrase-multilingual-MiniLM-L12-v2` 支持中文，且模型小（118MB），适合离线部署
 4. **NER 是可选增强项**：当前知识图谱已结构化，NER 作为语义入口锦上添花，但不是必须
