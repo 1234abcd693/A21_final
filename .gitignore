@@ -1,3 +1,7 @@
 # Oh My OpenCode 配置 (本地专属，不同步到 GitHub)
 opencode.json
 .opencode/
+
+# Obsidian 配置 (本地专属)
+.obsidian/
+**/.obsidian/
