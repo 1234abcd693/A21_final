@@ -18,10 +18,16 @@ model/
 *.gguf
 *.bin
 
-# 本地数据库
-data/
-chroma_db/
-*.db
+# 原始数据文件（大大的，不同步）
+data/raw/*.docx
+data/raw/*.pdf
+data/raw/*.txt
+!data/raw/README.txt
+
+# 本地生成的数据
+backend/data/chroma_db/
+backend/data/feedbacks.db
+backend/data/__pycache__/
 
 # Python
 __pycache__/

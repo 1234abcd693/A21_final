@@ -43,5 +43,8 @@ class Settings:
     # 参数
     PARAMS_PATH: str = os.getenv("PARAMS_PATH", str(BASE_DIR / "rag" / "params.json"))
 
+    # 原始数据
+    RAW_DATA_PATH: str = str(PROJECT_ROOT / "data" / "raw")
+
 
 settings = Settings()
