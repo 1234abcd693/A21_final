@@ -122,6 +122,19 @@
 
 ---
 
+### R8：语音输入
+
+> **来源**：用户自定义需求
+> **用户**：一线船员（海上作业时打字不便）
+
+| 编号 | 功能 | 说明 | 实现模块 | 状态 |
+|:---:|------|------|----------|:--:|
+| F8.1 | **按住录音** | 前端麦克风按钮，按住录音、松手结束 | 前端 VoiceInput.vue（MediaRecorder API） | 🔴 待设计 |
+| F8.2 | **语音转文字** | whisper.cpp (base 140MB) 本地转录，离线运行 | whisper-server :8081 + 后端 /transcribe | 🔴 待设计 |
+| F8.3 | **结果填入** | 转录文本自动填入输入框，用户可编辑后发送 | 前端 InputBox.vue | 🔴 待设计 |
+
+---
+
 ## 二、功能与模块的对应关系
 
 ```
@@ -134,6 +147,7 @@ F4.1-F4.5   反馈优化   →   前端 Feedback + 服务层 /feedback /optimize
 F5.1-F5.3   U盘同步    →   前端 + 服务层 /export /import + 工具层 sync
 F6.1-F6.4   历史对话   →   前端 History + 服务层 /history + 数据层
 F7.1-F7.3   系统管理   →   Electron main.js + 服务层 /health
+F8.1-F8.3   语音输入   →   前端 VoiceInput + 服务层 /transcribe + whisper-server
 ```
 
 ---
@@ -151,14 +165,15 @@ F7.1-F7.3   系统管理   →   Electron main.js + 服务层 /health
 | 打包方案 | packaging-guide.md（PyInstaller + electron-builder → 单个 Setup.exe） |
 | 依赖文件 | `backend/requirements.txt`（16 个包） |
 | 协作流程 | github-workflow.md（Git 命令详解 + 模块分支策略） |
-| 知识库 | 23 篇概念笔记（面向小白） |
+| 知识库 | 25 篇概念笔记（面向小白） |
 | Git 配置 | .gitignore 完整，opencode 配置已生效 |
+| 语音输入 | whisper.cpp 方案已设计（base 140MB，离线，按需转录） |
 
 ### 🔴 待设计（下一步）
 
 | 优先级 | 类别 | 说明 |
 |:--:|------|------|
-| 1 | **API 契约** | 10 个接口的请求/响应 JSON 格式定义 |
+| 1 | **API 契约** | 11 个接口的请求/响应 JSON 格式定义 |
 | 2 | **数据模型** | Neo4j 节点属性、Chroma collection、SQLite 表结构 |
 | 3 | **前端组件规范** | 每个 Vue 组件的 props/events/状态 |
 | 4 | **后端模块接口** | 每个 Python 模块的类和方法签名 |
@@ -198,4 +213,4 @@ A21_final/
 
 | 日期 | 版本 | 变更 |
 |------|------|------|
-| 2026-05-25 | v1.0 | 初始版本：需求→功能→模块完整追踪，项目状态总览 |
+| 2026-05-25 | v1.1 | 新增 R8 语音输入（whisper.cpp），知识库扩至25篇 |

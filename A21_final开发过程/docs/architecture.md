@@ -84,6 +84,7 @@
 | `/api/v1/feedback` | POST | 提交 👍/👎 |
 | `/api/v1/export` | GET | 导出数据包（zip） |
 | `/api/v1/import` | POST | 导入数据包 |
+| `/api/v1/transcribe` | POST | 语音转文字（→ whisper-server :8081） |
 | `/api/v1/history` | GET | 历史对话列表 |
 | `/api/v1/report` | GET | 导出问答报告 |
 
