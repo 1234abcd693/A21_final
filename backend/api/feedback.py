@@ -18,6 +18,9 @@ router = APIRouter()
 class FeedbackRequest(BaseModel):
     message_id: str
     rating: int
+    question: str = ""
+    answer_text: str = ""
+    retrieved_chunks: str = "[]"
     comment: Optional[str] = None
 
 
@@ -26,13 +29,13 @@ async def submit_feedback(req: FeedbackRequest):
     """提交点赞/点踩"""
     if req.rating not in (-1, 0, 1):
         raise HTTPException(400, "rating must be -1, 0, or 1")
-    # 简化版：从请求中获取 question/answer（实际应从对话缓存获取）
+
     save_feedback(
         message_id=req.message_id,
-        question="",
-        answer_text="",
+        question=req.question,
+        answer_text=req.answer_text,
         rating=req.rating,
-        retrieved_chunks="[]",
+        retrieved_chunks=req.retrieved_chunks or "[]",
         comment=req.comment,
     )
     return {"status": "ok", "total_feedbacks": get_feedback_count()}

@@ -100,8 +100,15 @@ async function onSend(text) {
 }
 
 function onFeedback(msgId, rating) {
+  const msg = messages.value.find(m => m.messageId === msgId)
   import('../api/index.js').then(({ feedbackAPI }) => {
-    feedbackAPI.submit({ message_id: msgId, rating })
+    feedbackAPI.submit({
+      message_id: msgId,
+      rating,
+      question: messages.value.find(m => m.role === 'user' && m.id < msg.id)?.content || '',
+      answer_text: msg?.content || '',
+      retrieved_chunks: JSON.stringify(msg?.citations || []),
+    })
   })
 }
 

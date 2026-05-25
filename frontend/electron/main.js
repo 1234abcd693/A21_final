@@ -50,14 +50,26 @@ function startBackend() {
     ? [path.join(resourcesPath, 'main.py')]
     : []
 
+  // 启动 Python 后端
   backendProcess = spawn(backendExe, backendArgs, {
     cwd: resourcesPath,
     env: { ...process.env, NEO4J_PASSWORD: 'a21password' },
     stdio: 'pipe',
   })
-
   backendProcess.stdout?.on('data', (data) => console.log(`[backend] ${data}`))
   backendProcess.stderr?.on('data', (data) => console.error(`[backend] ${data}`))
+
+  // 启动 whisper-server
+  if (isDev) {
+    const whisperPath = path.join(__dirname, '..', '..', 'whisper.cpp', 'Release')
+    const modelPath = path.join(__dirname, '..', '..', 'model', 'ggml-base.bin')
+    const whisperProcess = spawn(
+      path.join(whisperPath, 'whisper-server.exe'),
+      ['-m', modelPath, '--host', '127.0.0.1', '--port', '8081'],
+      { stdio: 'pipe' },
+    )
+    whisperProcess.stdout?.on('data', (data) => console.log(`[whisper] ${data}`))
+  }
 }
 
 // IPC: 打开文件对话框

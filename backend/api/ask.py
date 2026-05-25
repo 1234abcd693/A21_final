@@ -2,10 +2,11 @@
 问答路由 (POST /api/v1/ask — SSE 流式)
 """
 
+import json
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
@@ -13,6 +14,13 @@ from rag.generator import ask_stream
 from rag.validator import validate_answer, format_warning
 
 router = APIRouter()
+
+# 消息缓存（feedback 提交时需要完整上下文）
+_message_cache: dict[str, dict] = {}
+
+
+def get_cached_message(message_id: str) -> Optional[dict]:
+    return _message_cache.get(message_id)
 
 
 class AskRequest(BaseModel):
@@ -30,6 +38,8 @@ async def ask(req: AskRequest):
     async def event_generator():
         full_answer = ""
         citations = []
+        message_id = ""
+        retrieved_chunks_str = "[]"
 
         try:
             async for event in ask_stream(
@@ -43,10 +53,9 @@ async def ask(req: AskRequest):
                     full_answer += event["token"]
                     yield f"data: {event['token']}\n\n"
                 elif event["type"] == "metadata":
-                    citations = event["citations"]
-                    # 验证
+                    citations = event.get("citations", [])
+                    message_id = event.get("message_id", "")
                     retrieved_chunks_str = event.get("retrieved_chunks", "[]")
-                    import json
                     chunks = json.loads(retrieved_chunks_str) if isinstance(retrieved_chunks_str, str) else []
                     validation = validate_answer(full_answer, citations, chunks)
                     warning = format_warning(validation["confidence"])
@@ -57,6 +66,11 @@ async def ask(req: AskRequest):
 
                     event["traceability"] = validation
                     yield f"event: metadata\ndata: {json.dumps(event, ensure_ascii=False)}\n\n"
+
+            # 缓存消息（供 feedback 使用）
+            if message_id:
+                from api.transcribe import cache_message
+                cache_message(message_id, req.question, full_answer, retrieved_chunks_str)
 
             yield "event: done\ndata: {}\n\n"
 

@@ -61,6 +61,14 @@
 | 14:45 | AI | 检查 | 模型 + llama-server + APOC + JRE + Python依赖 + node_modules 全部就位 |
 | 14:45 | AI | 创建 | `start_all.bat` — 一键启动 Neo4j + llama-server + 后端 + 前端 |
 | 14:45 | AI | 状态 | whisper.cpp 未下载（语音输入暂不可用），不影响核心功能 |
+| 15:00 | AI | 修复 | whisper路径修正(`whisper.cpp/Release/`) + start_all.bat 加入 whisper-server |
+| 15:00 | AI | 实现 | confirm_import 完整实现（Neo4j MERGE + Chroma add_chunks） |
+| 15:00 | AI | 修复 | feedback 存储携带完整 question/answer/retrieved_chunks |
+| 15:00 | AI | 实现 | 补充 user/stats + user/profile 端点（个人中心统计+设置） |
+| 15:00 | AI | 实现 | 报告导出（Word docx + 纯文本降级） |
+| 15:00 | AI | 修复 | auth 密码优先用 bcrypt（降级到 hashlib） |
+| 15:00 | AI | 修复 | ask.py 消息缓存 + 前端 feedback 发送完整上下文 |
+| 15:00 | AI | 修复 | Electron main.js 加入 whisper-server 启动 |
 
 ---
 
