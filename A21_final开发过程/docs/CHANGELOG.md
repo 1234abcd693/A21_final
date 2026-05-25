@@ -43,6 +43,18 @@
 | 14:10 | AI | 开发 | 完成 `backend/tools/sync.py` — U盘导出/导入 |
 | 14:15 | AI | 开发 | 完成 `backend/api/` — 8 个路由模块 + 注册中心 |
 | 14:15 | AI | 开发 | 更新 `backend/main.py` — lifespan 初始化数据库 |
+| 14:15 | AI | 提交 | `backend: 完成后端全部代码开发(18个文件, 8个API模块)` |
+| 14:20 | AI | 分支 | 创建 `feat/frontend` 分支（从 feat/backend 分出） |
+| 14:20 | AI | 创建 | `npm create vite@latest frontend -- --template vue` 搭建项目 |
+| 14:25 | AI | 开发 | 完成 `frontend/src/api/index.js` — axios 封装 + 全部 API 方法 |
+| 14:25 | AI | 开发 | 完成 `TopBar.vue` — 搜索栏组件 |
+| 14:25 | AI | 开发 | 完成 `GraphPanel.vue` — 图谱主视图（D3 placeholder） |
+| 14:25 | AI | 开发 | 完成 `DetailPanel.vue` — 节点详情 + 溯源面板 |
+| 14:25 | AI | 开发 | 完成 `ChatPanel.vue` — 问答面板（SSE 流式接收） |
+| 14:25 | AI | 开发 | 完成 `MessageBubble.vue` — 消息气泡（含溯源卡片） |
+| 14:25 | AI | 开发 | 完成 `FeedbackButtons.vue` — 点赞/点踩 |
+| 14:25 | AI | 开发 | 完成 `InputBox.vue` — 输入框 + 语音按钮 |
+| 14:25 | AI | 开发 | 完成 `TraceCard.vue` — 溯源折叠卡片 |
 
 ---
 
@@ -53,4 +65,6 @@
 - [ ] 下载 Qwen2.5-1.5B Q4_K_M → `model/`
 - [ ] 下载 whisper.cpp → `whisper.cpp/`
 - [x] 创建 `feat/backend` 分支开始后端开发 ✅
+- [x] 创建 `feat/frontend` 分支开始前端开发 ✅
+- [ ] `npm install` + `npm install axios`（你手动跑，网络超时）
 - [ ] 创建 `feat/frontend` 分支开始前端开发
