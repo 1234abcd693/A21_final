@@ -58,16 +58,22 @@
 | 14:30 | AI | 修复 | Vite 9 降级到 Vite 5（rolldown 原生模块不兼容 Node v24） |
 | 14:35 | AI | 开发 | 添加 Electron 桌面壳（main.js + preload.js + package.json 构建配置） |
 | 14:40 | AI | 配置 | neo4j.bat 指向自带 JRE（jlink 裁剪 ~50MB），分发无需系统 Java |
+| 14:45 | AI | 检查 | 模型 + llama-server + APOC + JRE + Python依赖 + node_modules 全部就位 |
+| 14:45 | AI | 创建 | `start_all.bat` — 一键启动 Neo4j + llama-server + 后端 + 前端 |
+| 14:45 | AI | 状态 | whisper.cpp 未下载（语音输入暂不可用），不影响核心功能 |
 
 ---
 
 ## 待完成
 
-- [ ] 下载 APOC jar → `neo4j/.../plugins/`
-- [ ] 下载 llama.cpp → `llama.cpp/`
-- [ ] 下载 Qwen2.5-1.5B Q4_K_M → `model/`
-- [ ] 下载 whisper.cpp → `whisper.cpp/`
-- [x] 创建 `feat/backend` 分支开始后端开发 ✅
-- [x] 创建 `feat/frontend` 分支开始前端开发 ✅
-- [ ] `npm install` + `npm install axios`（你手动跑，网络超时）
+- [x] 下载 APOC jar → `neo4j/.../plugins/` ✅
+- [x] 下载 llama.cpp → `llama.cpp/` ✅
+- [x] 下载 Qwen2.5-1.5B Q4_K_M → `model/` ✅
+- [ ] 下载 whisper.cpp + ggml-base.bin → `whisper.cpp/` + `model/`
+- [x] 创建 `feat/backend` 分支 ✅
+- [x] 创建 `feat/frontend` 分支 ✅
+- [x] `npm install` 前端依赖 ✅
+- [ ] Electron 集成测试
+- [ ] 端到端问答测试
+- [ ] 打包 (PyInstaller + electron-builder)
 - [ ] 创建 `feat/frontend` 分支开始前端开发
