@@ -1,0 +1,44 @@
+{
+  // Python 解释器 — 选择 conda a21 环境
+  // Ctrl+Shift+P → "Python: Select Interpreter" → 选 a21
+  "python.defaultInterpreterPath": "~/miniconda3/envs/a21/python.exe",
+
+  // 使用 Pylance 语言服务器（更好的类型提示和自动补全）
+  "python.languageServer": "Pylance",
+
+  // 保存时自动格式化
+  "[python]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+
+  // 终端默认使用 conda 环境
+  "python.terminal.activateEnvironment": true,
+
+  // Vue 文件支持
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // 排除大文件目录（搜索时跳过）
+  "search.exclude": {
+    "**/neo4j": true,
+    "**/llama.cpp": true,
+    "**/model": true,
+    "**/node_modules": true,
+    "**/chroma_db": true,
+    "**/__pycache__": true
+  },
+
+  // 文件监视排除（防止 VS Code 卡顿）
+  "files.watcherExclude": {
+    "**/neo4j/**": true,
+    "**/llama.cpp/**": true,
+    "**/model/**": true,
+    "**/node_modules/**": true,
+    "**/chroma_db/**": true
+  }
+}
