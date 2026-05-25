@@ -6,3 +6,34 @@ opencode.json
 # Obsidian 配置 (本地专属)
 .obsidian/
 **/.obsidian/
+
+# Neo4j 运行目录
+neo4j/
+
+# llama.cpp 可执行文件
+llama.cpp/
+
+# 模型文件（太大）
+model/
+*.gguf
+*.bin
+
+# 本地数据库
+data/
+chroma_db/
+*.db
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+.env
+
+# Node.js
+node_modules/
+dist/
+
+# 打包产物
+*.exe
+*.msi
