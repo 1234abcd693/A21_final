@@ -69,6 +69,14 @@
 | 15:00 | AI | 修复 | auth 密码优先用 bcrypt（降级到 hashlib） |
 | 15:00 | AI | 修复 | ask.py 消息缓存 + 前端 feedback 发送完整上下文 |
 | 15:00 | AI | 修复 | Electron main.js 加入 whisper-server 启动 |
+| 15:30 | AI | 设计 | #002EA6 + #FFE76F 配色系统，完整前端视觉 |
+| 15:30 | AI | 开发 | LoginView.vue — 登录页（渐变背景+品牌标识） |
+| 15:30 | AI | 开发 | HistoryPanel.vue — 历史管理（搜索/置顶/选择删除/批量） |
+| 15:30 | AI | 开发 | ProfileView.vue — 个人中心（统计/设置/头像颜色） |
+| 15:30 | AI | 开发 | AdminView.vue — 用户管理（添加/删除） |
+| 15:30 | AI | 开发 | GraphPanel.vue — D3.js 力导向图（拖拽/缩放/高亮/点击展开） |
+| 15:30 | AI | 重写 | TopBar/ChatPanel/DetailPanel/App.vue — 全新设计系统 |
+| 15:30 | AI | 修复 | whisper 模型: ggml-silero 是 VAD，非 STT，需下载 ggml-base.bin |
 
 ---
 
