@@ -124,7 +124,34 @@ main ─────────────────────────
 
 ---
 
-## 五、性能约束与应对
+## 五、关于 C++ 的说明
+
+项目标记为"Python + C++"，但 C++ 部分**不需要你写代码**：
+
+| 是什么 | 角色 | 你需要做什么 |
+|--------|------|------------|
+| llama.cpp | C++ 写的 LLM 推理引擎 | 下载预编译的 `llama-server.exe`，命令行启动，Python 通过 HTTP 调用 |
+| 编译 | 已经由 llama.cpp 项目组完成了 | 不需要装 CMake、不需要编译 |
+
+> llama.cpp 之于本项目，就像 Chrome 之于 Selenium 自动化测试——你用它，但不改它。
+
+---
+
+## 六、桌面应用打包
+
+| 组件 | 工具 | 产物 |
+|------|------|------|
+| Python 后端 | PyInstaller | `backend.exe` |
+| 前端 | Vite + electron-builder | `A21 船舶故障诊断系统 Setup.exe` |
+| llama.cpp | 预编译 | `llama-server.exe`（直接放进 resources） |
+| 模型 | — | `model/*.gguf`（直接放进 resources） |
+| Neo4j | 绿色版 | `neo4j/`（内置 JRE，直接放进 resources） |
+
+详见 `docs/packaging-guide.md`。用户双击 exe → 自动启动 Neo4j + llama-server + 后端 → 打开窗口。
+
+---
+
+## 七、性能约束与应对
 
 | 约束 | 应对措施 |
 |------|----------|
@@ -136,13 +163,18 @@ main ─────────────────────────
 
 ---
 
-## 六、相关文档
+## 八、相关文档
 
 | 文档 | 位置 |
 |------|------|
 | 需求规格 | `docs/requirements.md` |
 | 架构设计 | `docs/architecture.md` |
 | 协作流程 | `docs/github-workflow.md` |
+| 环境搭建 | `docs/dev-env-setup.md` |
+| 打包方案 | `docs/packaging-guide.md` |
+| 依赖清单 | `../backend/requirements.txt` |
+| 知识图谱设计 | `../知识图谱设计文档.md` |
+| KG 初始数据 | `../import.cypher` |
 | 知识库(23篇) | `知识库/` |
 
 ---
@@ -151,4 +183,4 @@ main ─────────────────────────
 
 | 日期 | 版本 | 变更 |
 |------|------|------|
-| 2026-05-22 | v2.0 | 全部 10 项决策完成，架构设计阶段完结 |
+| 2026-05-22 | v2.1 | 补全打包方案(双语言说明)、环境依赖文件、桌面应用部署策略 |
