@@ -171,7 +171,8 @@ main ─────────────────────────
 | 架构设计 | `docs/architecture.md` |
 | 协作流程 | `docs/github-workflow.md` |
 | 环境搭建 | `docs/dev-env-setup.md` |
-| 打包方案 | `docs/packaging-guide.md` |
+| Neo4j 指南 | `docs/neo4j-guide.md` |
+| 测试方案 | `docs/testing-plan.md` |
 | 依赖清单 | `../backend/requirements.txt` |
 | 知识图谱设计 | `../知识图谱设计文档.md` |
 | KG 初始数据 | `../import.cypher` |
