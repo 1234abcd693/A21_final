@@ -29,6 +29,20 @@
 | 13:45 | AI | 创建 | 本日志文件 `docs/CHANGELOG.md` |
 | 13:46 | AI | 提交 | `infra: 完成Neo4j配置(APOC+数据导入)，创建开发日志` |
 | 13:47 | AI | 分支 | 创建 `feat/backend` 分支（从 feat/infra 分出），开始后端开发 |
+| 14:00 | AI | 开发 | 完成 `backend/data/database.py` — SQLite 5 表初始化 |
+| 14:00 | AI | 开发 | 完成 `backend/kg/neo4j_client.py` — Neo4j 图谱操作（CRUD + 图检索） |
+| 14:00 | AI | 开发 | 完成 `backend/core/llm.py` — llama-server HTTP 流式/非流式封装 |
+| 14:00 | AI | 开发 | 完成 `backend/rag/vector_store.py` — Chroma 向量库初始化 + 检索 |
+| 14:05 | AI | 开发 | 完成 `backend/rag/entity_extractor.py` — jieba NER + 同义词扩展 |
+| 14:05 | AI | 开发 | 完成 `backend/rag/retriever.py` — BM25 + 向量 + 图检索 + RRF 融合 |
+| 14:05 | AI | 开发 | 完成 `backend/rag/generator.py` — Prompt 构建 + SSE 流式生成 |
+| 14:05 | AI | 开发 | 完成 `backend/rag/validator.py` — 两层防幻觉验证 |
+| 14:10 | AI | 开发 | 完成 `backend/feedback/` — 存储、BaseOptimizer、GridSearch、config |
+| 14:10 | AI | 开发 | 完成 `backend/tools/parser.py` — Word/PDF 文档解析 |
+| 14:10 | AI | 开发 | 完成 `backend/tools/extractor.py` — 正则知识抽取 |
+| 14:10 | AI | 开发 | 完成 `backend/tools/sync.py` — U盘导出/导入 |
+| 14:15 | AI | 开发 | 完成 `backend/api/` — 8 个路由模块 + 注册中心 |
+| 14:15 | AI | 开发 | 更新 `backend/main.py` — lifespan 初始化数据库 |
 
 ---
 

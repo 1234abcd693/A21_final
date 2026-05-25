@@ -1,9 +1,25 @@
+"""
+API 路由注册中心
+"""
+
 from fastapi import APIRouter
 
 router = APIRouter(prefix="/api/v1")
 
-# 各模块路由在此注册（Agent 开发时逐步添加）
-# from api.ask import router as ask_router      → router.include_router(ask_router)
-# from api.symptoms import router as sym_router → router.include_router(sym_router)
-# from api.graph import router as graph_router  → router.include_router(graph_router)
-# ...
+from api.health import router as health_router
+from api.auth import router as auth_router
+from api.ask import router as ask_router
+from api.symptoms import router as symptoms_router
+from api.feedback import router as feedback_router
+from api.history import router as history_router
+from api.sync import router as sync_router
+from api.transcribe import router as transcribe_router
+
+router.include_router(health_router, tags=["System"])
+router.include_router(auth_router, tags=["Auth"])
+router.include_router(ask_router, tags=["Q&A"])
+router.include_router(symptoms_router, tags=["Graph"])
+router.include_router(feedback_router, tags=["Feedback"])
+router.include_router(history_router, tags=["History"])
+router.include_router(sync_router, tags=["Sync"])
+router.include_router(transcribe_router, tags=["Tools"])
