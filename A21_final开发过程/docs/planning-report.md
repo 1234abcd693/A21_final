@@ -173,7 +173,7 @@ main ─────────────────────────
 | 环境搭建 | `docs/dev-env-setup.md` |
 | Neo4j 指南 | `docs/neo4j-guide.md` |
 | 测试方案 | `docs/testing-plan.md` |
-| 前端设计 | `docs/frontend-design.md` |
+| API 契约 | `docs/api-contract.md` (17 个接口) |
 | 依赖清单 | `../backend/requirements.txt` |
 | 知识图谱设计 | `../知识图谱设计文档.md` |
 | KG 初始数据 | `../import.cypher` |
