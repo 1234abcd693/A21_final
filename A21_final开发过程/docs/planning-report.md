@@ -175,6 +175,7 @@ main ─────────────────────────
 | 测试方案 | `docs/testing-plan.md` |
 | API 契约 | `docs/api-contract.md` (17 个接口) |
 | 数据模型 | `docs/data-model.md` (Chroma + SQLite + params.json) |
+| 用户系统 | `docs/user-system.md` (登录/注册/权限/历史管理) |
 | 依赖清单 | `../backend/requirements.txt` |
 | 知识图谱设计 | `../知识图谱设计文档.md` |
 | KG 初始数据 | `../import.cypher` |
