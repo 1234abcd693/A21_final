@@ -24,17 +24,19 @@
 
 | 编号 | 功能 | 说明 | 实现模块 | 状态 |
 |:---:|------|------|----------|:--:|
-| F1.1 | **输入问题** | 文本输入框，支持输入自然语言描述（如"发动机打不着火"）；同时支持关键词输入 | 前端 ChatWindow.vue | 🔴 待设计 |
-| F1.2 | **智能联想** | 输入时下拉提示已有故障现象，点击直接查询 | 前端 InputBox + 后端 /symptoms | 🔴 待设计 |
-| F1.3 | **图检索** | 从 Neo4j 知识图谱查故障原因链（Symptom→Cause→Step） | RAG 层 retriever.py → kg/neo4j_client.py | 🔴 待设计 |
-| F1.4 | **向量检索** | 从 Chroma 向量库查语义相似的维修文档 | RAG 层 retriever.py → Chroma | 🔴 待设计 |
-| F1.5 | **关键词检索** | BM25 精确匹配专业术语和参数值 | RAG 层 retriever.py | 🔴 待设计 |
-| F1.6 | **结果融合** | 三路检索结果用 RRF 融合排序 | RAG 层 retriever.py | 🔴 待设计 |
-| F1.7 | **LLM 生成回答** | 将检索结果注入 Prompt，调用 llama.cpp 生成结构化回答 | RAG 层 generator.py | 🔴 待设计 |
-| F1.8 | **流式展示** | 前端逐字显示回答（SSE），用户 2 秒内看到第一个字 | 后端 StreamingResponse + 前端 SSE 接收 | 🔴 待设计 |
-| F1.9 | **答案验证** | 生成后检查关键名词是否在源文档中出现，不可靠时标记警告 | RAG 层 validator.py | 🔴 待设计 |
-| F1.10 | **引用溯源** | 答案中标注 [1][2] 等引用，鼠标悬浮显示来源文档和页码 | 前端 MessageBubble.vue | 🔴 待设计 |
-| F1.11 | **答案导出** | 将当前问答记录导出为 Word 报告 | 工具层 report_generator.py | 🔴 待设计 |
+| F1.1 | **输入问题** | 智能问答模式：多行输入框，支持自然语言描述 | 前端 InputBox.vue | 🔴 待设计 |
+| F1.2 | **智能联想** | 输入时下拉提示已有故障现象，点击直接填入 | 前端 InputBox + 后端 /symptoms | 🔴 待设计 |
+| F1.3 | **关键词检索** | 切换到关键词模式：单行搜索框，空格分隔多词，返回文档列表 | 前端 SearchBar + SearchView | 🔴 待设计 |
+| F1.4 | **模式切换** | 智能问答 ⇄ 关键词检索，两种结果形式（对话气泡 vs 结果列表） | 前端 ModeSwitch.vue | 🔴 待设计 |
+| F1.5 | **图检索** | 从 Neo4j 知识图谱查故障原因链 | RAG 层 retriever.py → kg/neo4j_client.py | 🔴 待设计 |
+| F1.6 | **向量检索** | 从 Chroma 向量库查语义相似的维修文档 | RAG 层 retriever.py → Chroma | 🔴 待设计 |
+| F1.7 | **关键词检索** | BM25 精确匹配专业术语和参数值 | RAG 层 retriever.py | 🔴 待设计 |
+| F1.8 | **结果融合** | 三路检索结果用 RRF 融合排序 | RAG 层 retriever.py | 🔴 待设计 |
+| F1.9 | **LLM 生成回答** | 将检索结果注入 Prompt，调用 llama.cpp 生成结构化回答 | RAG 层 generator.py | 🔴 待设计 |
+| F1.10 | **流式展示** | 前端逐字显示回答（SSE），用户 2 秒内看到第一个字 | 后端 StreamingResponse + 前端 SSE 接收 | 🔴 待设计 |
+| F1.11 | **答案验证** | 生成后检查关键名词是否在源文档中出现 | RAG 层 validator.py | 🔴 待设计 |
+| F1.12 | **引用溯源** | 答案中引用可点击，悬浮显示来源文档和页码 | 前端 MessageBubble.vue | 🔴 待设计 |
+| F1.13 | **答案导出** | 将当前问答记录导出为 Word 报告 | 工具层 report_generator.py | 🔴 待设计 |
 
 ---
 
