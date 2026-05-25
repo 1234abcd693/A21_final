@@ -27,6 +27,8 @@
 | 13:38 | AI | 检查 | APOC 未加载，发现 apoc-2026.02.3-core.jar 不在 plugins/ 目录 |
 | 13:40 | AI | 建议 | 需下载 APOC jar / llama.cpp / 模型文件（用户暂无法下载） |
 | 13:45 | AI | 创建 | 本日志文件 `docs/CHANGELOG.md` |
+| 13:46 | AI | 提交 | `infra: 完成Neo4j配置(APOC+数据导入)，创建开发日志` |
+| 13:47 | AI | 分支 | 创建 `feat/backend` 分支（从 feat/infra 分出），开始后端开发 |
 
 ---
 
@@ -36,5 +38,5 @@
 - [ ] 下载 llama.cpp → `llama.cpp/`
 - [ ] 下载 Qwen2.5-1.5B Q4_K_M → `model/`
 - [ ] 下载 whisper.cpp → `whisper.cpp/`
-- [ ] 创建 `feat/backend` 分支开始后端开发
+- [x] 创建 `feat/backend` 分支开始后端开发 ✅
 - [ ] 创建 `feat/frontend` 分支开始前端开发
