@@ -8,7 +8,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = BASE_DIR.parent  # A21_final/
 load_dotenv(BASE_DIR / ".env")
+
+# 确保 data 目录存在
+(BASE_DIR / "data").mkdir(parents=True, exist_ok=True)
 
 
 class Settings:
