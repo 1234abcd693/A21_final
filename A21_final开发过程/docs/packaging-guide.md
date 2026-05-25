@@ -259,7 +259,20 @@ Neo4j 需要 Java 运行环境。两个方案：
 | A: 内置 JRE | 在 resources/neo4j/ 里放一个 jre/ 目录 | 用户零依赖 | 增加 ~150 MB |
 | B: 系统检测 | 启动时检查系统是否装了 Java，没装就提示 | 更小的安装包 | 用户可能不会装 |
 
-**推荐方案 A**：下载 Adoptium JDK 11 的 JRE 压缩包，解压到 `neo4j/jre/` 目录，修改 `neo4j.bat` 的 `JAVA_HOME` 指向它。
+**推荐方案 A**（仅增加 ~50 MB）：
+
+```powershell
+# 从你已安装的 JDK 26 生成精简 JRE
+jlink --add-modules java.base,java.logging,java.xml,java.management,java.naming,java.sql --output neo4j\jre
+```
+
+然后修改 `neo4j\bin\neo4j.bat`，在文件开头加上：
+```batch
+set JAVA_HOME=%~dp0..\jre
+set PATH=%JAVA_HOME%\bin;%PATH%
+```
+
+Neo4j 启动时自动用我们自带的 Java，不管用户系统有没有装 Java。
 
 ---
 
