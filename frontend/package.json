@@ -1,18 +1,52 @@
 {
-  "name": "frontend",
+  "name": "a21-ship-diagnosis",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "0.1.0",
+  "main": "electron/main.js",
   "scripts": {
+    "dev:vue": "vite",
+    "dev:electron": "electron .",
     "dev": "vite",
-    "build": "vite build",
+    "build:vue": "vite build",
+    "build:electron": "electron-builder --win",
+    "build": "vite build && electron-builder --win",
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.16.1",
     "vue": "^3.5.34"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.6",
-    "vite": "^8.0.12"
+    "@vitejs/plugin-vue": "^5.2.0",
+    "electron": "^34.0.0",
+    "electron-builder": "^25.0.0",
+    "vite": "^5.4.0"
+  },
+  "build": {
+    "appId": "com.a21.ship-diagnosis",
+    "productName": "A21 船舶故障诊断系统",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "extraResources": [
+      { "from": "../backend/dist/backend.exe", "to": "backend.exe" },
+      { "from": "../llama.cpp/llama-server.exe", "to": "llama-server.exe" },
+      { "from": "../model/", "to": "model/" },
+      { "from": "../neo4j/", "to": "neo4j/", "filter": ["**/*", "!data/databases/neo4j/*"] },
+      { "from": "../import.cypher", "to": "import.cypher" }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/favicon.svg"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
   }
 }

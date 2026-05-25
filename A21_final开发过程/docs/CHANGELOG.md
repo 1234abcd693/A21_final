@@ -55,6 +55,8 @@
 | 14:25 | AI | 开发 | 完成 `FeedbackButtons.vue` — 点赞/点踩 |
 | 14:25 | AI | 开发 | 完成 `InputBox.vue` — 输入框 + 语音按钮 |
 | 14:25 | AI | 开发 | 完成 `TraceCard.vue` — 溯源折叠卡片 |
+| 14:30 | AI | 修复 | Vite 9 降级到 Vite 5（rolldown 原生模块不兼容 Node v24） |
+| 14:35 | AI | 开发 | 添加 Electron 桌面壳（main.js + preload.js + package.json 构建配置） |
 
 ---
 
