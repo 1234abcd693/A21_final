@@ -12,7 +12,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import * as d3 from 'd3'
-import { graphAPI, api } from '../api/index.js'
+import { graphAPI } from '../api/index.js'
 
 const props = defineProps({ highlightNodes: { type: Array, default: () => [] } })
 const emit = defineEmits(['node-click'])
