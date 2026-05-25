@@ -178,8 +178,7 @@ F8.1-F8.3   语音输入   →   前端 VoiceInput + 服务层 /transcribe + whi
 | 优先级 | 类别 | 说明 |
 |:--:|------|------|
 | 1 | **API 契约** | `docs/api-contract.md` (17 个接口完整定义) ✅ |
-| 2 | **数据模型** | Neo4j 节点属性、Chroma collection、SQLite 表结构 |
-| 2 | **数据模型** | Neo4j 节点属性、Chroma collection、SQLite 表结构 |
+| 2 | **数据模型** | ✅ `docs/data-model.md` (Chroma 1 collection + SQLite 4 表 + params.json) |
 | 3 | **前端组件规范** | 每个 Vue 组件的 props/events/状态 |
 | 4 | **后端模块接口** | 每个 Python 模块的类和方法签名 |
 | 5 | **Prompt 模板** | 系统指令、检索结果注入格式 |
