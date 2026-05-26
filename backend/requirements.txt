@@ -39,6 +39,11 @@ diskcache==5.6.3
 # 配置管理
 python-dotenv==1.0.0
 
-# 语音识别 (Vosk WebSocket)
+# 语音识别 (Vosk HTTP)
 vosk==0.3.45
-websockets==13.0
+
+# 密码加密 (优先使用)
+bcrypt==4.2.0
+
+# 打包工具 (开发环境)
+pyinstaller==6.11.0
