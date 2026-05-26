@@ -52,7 +52,7 @@ def _get_collection() -> Any:
             metadata={
                 "description": "船舶故障诊断知识库",
                 "embedding_model": settings.EMBEDDING_MODEL,
-                "hnsw:space": "cosine",  # bge 用 L2 归一化 → 余弦距离
+                "hnsw:space": "cosine",
             },
         )
     return _collection

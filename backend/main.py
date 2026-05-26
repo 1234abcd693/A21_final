@@ -10,6 +10,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import ORJSONResponse
 
 from api import router as api_router
 
@@ -46,6 +47,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     lifespan=lifespan,
+    default_response_class=ORJSONResponse,
 )
 
 app.add_middleware(
