@@ -1,48 +1,43 @@
 @echo off
-chcp 65001 >nul
-echo ========================================
-echo  A21 船舶故障诊断系统 - 开发环境启动
-echo ========================================
-echo.
-
+chcp 65001 >nul 2>&1
+title A21 Startup
 set BASE=%~dp0
 
-REM 启动 Neo4j
-echo [1/5] 启动 Neo4j...
+echo ========================================
+echo  A21 Ship Diagnosis System - Starting
+echo ========================================
+echo.
+
+echo [1/5] Starting Neo4j...
 start "Neo4j" /D "%BASE%neo4j\neo4j-community-2026.02.3\bin" cmd /c "neo4j.bat console"
-echo       等待 Neo4j 就绪 (15秒)...
+echo        Waiting 15s...
 timeout /t 15 /nobreak >nul
 
-REM 启动 llama-server (端口8082, 避免冲突)
-echo [2/5] 启动 llama-server (端口 8082)...
-start "llama-server" /D "%BASE%llama.cpp" cmd /c "llama-server.exe -m %BASE%model\qwen2.5-1.5b-instruct-q4_k_m.gguf -c 2048 -t 4 --host 127.0.0.1 --port 8082 --mlock"
-echo       等待 llama-server 就绪 (10秒)...
+echo [2/5] Starting llama-server (port 8082)...
+start "llama" /D "%BASE%llama.cpp" cmd /c "llama-server.exe -m %BASE%model\qwen2.5-1.5b-instruct-q4_k_m.gguf -c 2048 -t 4 --host 127.0.0.1 --port 8082 --mlock"
+echo        Waiting 10s...
 timeout /t 10 /nobreak >nul
 
-REM 启动 whisper-server
-echo [3/6] 启动 Vosk 语音识别...
+echo [3/5] Starting Vosk (port 8765)...
 start "Vosk" /D "%BASE%backend" cmd /c "call conda activate a21 && python tools\vosk_http.py"
-echo       等待 Vosk 就绪 (5秒)...
+echo        Waiting 5s...
 timeout /t 5 /nobreak >nul
 
-REM 启动 FastAPI 后端 (需要 conda 环境)
-echo [4/6] 启动后端 (端口 8000)...
-start "FastAPI" /D "%BASE%backend" cmd /c "call conda activate a21 && uvicorn main:app --host 127.0.0.1 --port 8000"
+echo [4/5] Starting Backend (port 8000)...
+start "Backend" /D "%BASE%backend" cmd /c "call conda activate a21 && uvicorn main:app --host 127.0.0.1 --port 8000"
 timeout /t 5 /nobreak >nul
 
-REM 启动前端
-echo [5/6] 启动前端 (端口 5173)...
-start "Vue" /D "%BASE%frontend" cmd /c "npm run dev"
+echo [5/5] Starting Frontend (port 5173)...
+start "Frontend" /D "%BASE%frontend" cmd /c "npm run dev"
 
 echo.
 echo ========================================
-echo  所有服务启动中...
+echo  All services starting...
 echo.
-echo   Neo4j:         http://localhost:7474
-echo   llama-server:  http://localhost:8082
-echo   Vosk语音:      http://localhost:8765
-echo   后端 API:       http://localhost:8000/docs
-echo   前端:           http://localhost:5173
+echo   Neo4j:    http://localhost:7474
+echo   llama:    http://localhost:8082
+echo   Vosk:     http://localhost:8765
+echo   Backend:  http://localhost:8000/docs
+echo   Frontend: http://localhost:5173
 echo ========================================
-echo.
 pause
