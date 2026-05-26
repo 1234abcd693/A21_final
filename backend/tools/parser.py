@@ -2,6 +2,7 @@
 文档解析（Word/PDF → 纯文本）
 """
 
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -43,9 +44,21 @@ def parse_file(file_path: str) -> dict:
     elif ext == ".pdf":
         text = parse_pdf(file_path)
     elif ext == ".txt":
-        text = Path(file_path).read_text(encoding="utf-8")
+        # 尝试多种编码
+        for enc in ["utf-8", "gbk", "gb2312", "gb18030"]:
+            try:
+                text = Path(file_path).read_text(encoding=enc)
+                break
+            except (UnicodeDecodeError, UnicodeError):
+                continue
+        else:
+            text = Path(file_path).read_text(encoding="utf-8", errors="replace")
     else:
         raise ValueError(f"不支持的文件格式: {ext}")
+
+    # 清理：移除图片引用标记和空行
+    text = re.sub(r'\[Image:.*?\]', '', text)
+    text = re.sub(r'\n{3,}', '\n\n', text)
 
     return {
         "file_name": Path(file_path).name,
