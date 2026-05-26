@@ -1,107 +1,31 @@
 <template>
-  <div class="history-panel">
-    <div class="panel-header">
-      <h3>📜 历史对话</h3>
-      <span v-if="selected.size" class="batch-bar">
-        已选 {{ selected.size }} 项
-        <button @click="batchDelete" class="btn-batch">🗑 删除</button>
-      </span>
-    </div>
-
-    <div class="search-box">
-      <input v-model="searchQuery" placeholder="搜索会话..." @input="onSearch" />
-    </div>
-
-    <div class="list">
-      <div v-for="s in sessions" :key="s.session_id"
-           :class="['item', { pinned: s.pinned, selected: selected.has(s.session_id) }]">
-        <input type="checkbox" :checked="selected.has(s.session_id)" @change="toggleSelect(s.session_id)" class="cb" />
-        <div class="content" @click="$emit('select', s)">
-          <div class="title-row">
-            <span v-if="s.pinned" class="pin">📌</span>
-            <span class="title">{{ s.title }}</span>
-          </div>
-          <div class="meta">{{ s.message_count }} 条消息 · {{ formatTime(s.updated_at) }}</div>
-        </div>
-        <div class="actions">
-          <button @click.stop="togglePin(s)" :title="s.pinned ? '取消置顶' : '置顶'">{{ s.pinned ? '📌' : '📍' }}</button>
-          <button @click.stop="deleteSession(s.session_id)" title="删除">🗑</button>
-        </div>
-      </div>
-      <div v-if="!sessions.length" class="empty">暂无历史对话</div>
-    </div>
+  <div class="hp"><div class="ph"><h3>📜 历史</h3><span v-if="sel.size" class="bb">已选{{sel.size}}<button @click="batchDel" class="bd">🗑 删除</button></span></div>
+    <div class="sb"><input v-model="q" placeholder="搜索会话..." @input="onS"/></div>
+    <div class="lst"><div v-for="s in sessions" :key="s.session_id" :class="['it',{p:s.pinned,sl:sel.has(s.session_id)}]">
+      <input type="checkbox" :checked="sel.has(s.session_id)" @change="tg(s.session_id)" class="cb"/>
+      <div class="ct" @click="$emit('select',s)"><div class="tr"><span v-if="s.pinned" class="pn">📌</span><span class="tl">{{s.title||'(无标题)'}}</span></div><div class="mt">{{s.message_count||0}} 条 · {{(s.updated_at||'').slice(0,16).replace('T',' ')}}</div></div>
+      <div class="ac"><button @click.stop="pin(s)" :title="s.pinned?'取消':'置顶'">{{s.pinned?'📌':'📍'}}</button><button @click.stop="del(s.session_id)" title="删除">🗑</button></div>
+    </div><div v-if="!sessions.length" class="em">暂无历史对话</div></div>
   </div>
 </template>
-
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { historyAPI } from '../api/index.js'
-
-const emit = defineEmits(['select', 'close'])
-const sessions = ref([])
-const searchQuery = ref('')
-const selected = ref(new Set())
-let timer = null
-
-onMounted(fetchAll)
-
-function fetchAll() {
-  const params = { page: 1, page_size: 50 }
-  if (searchQuery.value) {
-    historyAPI.search({ q: searchQuery.value, page: 1, page_size: 50 }).then(({ data }) => sessions.value = data.sessions || [])
-  } else {
-    historyAPI.list(params).then(({ data }) => sessions.value = data.sessions || [])
-  }
-}
-
-function onSearch() {
-  clearTimeout(timer); timer = setTimeout(fetchAll, 300)
-}
-
-async function deleteSession(sid) {
-  await historyAPI.delete(sid); fetchAll()
-}
-
-async function togglePin(s) {
-  await historyAPI.pin(s.session_id, !s.pinned); fetchAll()
-}
-
-async function batchDelete() {
-  await historyAPI.batchDelete([...selected.value]); selected.value.clear(); fetchAll()
-}
-
-function toggleSelect(sid) {
-  const s = new Set(selected.value)
-  s.has(sid) ? s.delete(sid) : s.add(sid)
-  selected.value = s
-}
-
-function formatTime(t) { return t ? t.slice(0, 16).replace('T', ' ') : '' }
+import { ref, onMounted } from 'vue';import { historyAPI } from '../api/index.js'
+const emit=defineEmits(['select','close']);const sessions=ref([]),q=ref(''),sel=ref(new Set);let t=null
+onMounted(load)
+function load(){const p={page:1,page_size:50};if(q.value)historyAPI.search({q:q.value,...p}).then(({data})=>sessions.value=data.sessions||[]);else historyAPI.list(p).then(({data})=>sessions.value=data.sessions||[])}
+function onS(){clearTimeout(t);t=setTimeout(load,300)}
+async function del(sid){await historyAPI.delete(sid);load()}
+async function pin(s){await historyAPI.pin(s.session_id,!s.pinned);load()}
+async function batchDel(){await historyAPI.batchDelete([...sel.value]);sel.value.clear();load()}
+function tg(sid){const s=new Set(sel.value);s.has(sid)?s.delete(sid):s.add(sid);sel.value=s}
 </script>
-
 <style scoped>
-.history-panel { width: 360px; background: #fff; border-right: 1px solid #E8ECF1; display: flex; flex-direction: column; height: 100%; }
-.panel-header { padding: 16px 20px; border-bottom: 1px solid #E8ECF1; display: flex; justify-content: space-between; align-items: center; }
-.panel-header h3 { font-size: 16px; color: #002EA6; }
-.batch-bar { font-size: 12px; color: #FF4D4F; }
-.btn-batch { background: #FF4D4F; color: #fff; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
-.search-box { padding: 12px 16px; border-bottom: 1px solid #E8ECF1; }
-.search-box input { width: 100%; padding: 10px 14px; border: 2px solid #E8ECF1; border-radius: 8px; font-size: 13px; outline: none; }
-.search-box input:focus { border-color: #002EA6; }
-.list { flex: 1; overflow-y: auto; }
-.item { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F5F7FA; cursor: pointer; transition: background 0.15s; }
-.item:hover { background: #F0F4FF; }
-.item.pinned { background: #FFFDF0; }
-.item.selected { background: #E8F0FF; }
-.cb { margin-right: 10px; }
-.content { flex: 1; min-width: 0; }
-.title-row { display: flex; align-items: center; gap: 4px; }
-.title { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pin { font-size: 12px; }
-.meta { font-size: 12px; color: #999; margin-top: 4px; }
-.actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; }
-.item:hover .actions { opacity: 1; }
-.actions button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px; border-radius: 4px; }
-.actions button:hover { background: #F5F7FA; }
-.empty { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+.hp{width:360px;background:#fff;border-right:1px solid #E8ECF1;display:flex;flex-direction:column;height:100%}
+.ph{padding:14px 18px;border-bottom:1px solid #E8ECF1;display:flex;justify-content:space-between;align-items:center}
+.ph h3{font-size:15px;color:#002EA6}.bb{font-size:12px;color:#FF4D4F}.bd{background:#FF4D4F;color:#fff;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;margin-left:6px}
+.sb{padding:10px 14px;border-bottom:1px solid #E8ECF1}.sb input{width:100%;padding:8px 12px;border:2px solid #E8ECF1;border-radius:8px;font-size:13px;outline:none}.sb input:focus{border-color:#002EA6}
+.lst{flex:1;overflow-y:auto}.it{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #F5F7FA;cursor:pointer;transition:background .15s}.it:hover{background:#F0F4FF}.it.p{background:#FFFDF0}.it.sl{background:#E8F0FF}
+.cb{margin-right:8px}.ct{flex:1;min-width:0}.tr{display:flex;align-items:center;gap:4px}.tl{font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pn{font-size:11px}.mt{font-size:11px;color:#999;margin-top:3px}
+.ac{display:flex;gap:2px;opacity:0;transition:.2s}.it:hover .ac{opacity:1}.ac button{background:none;border:none;cursor:pointer;font-size:13px;padding:3px;border-radius:4px}.ac button:hover{background:#F5F7FA}
+.em{text-align:center;padding:40px;color:#999;font-size:13px}
 </style>
