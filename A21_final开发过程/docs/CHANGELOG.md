@@ -77,6 +77,9 @@
 | 15:30 | AI | 开发 | GraphPanel.vue — D3.js 力导向图（拖拽/缩放/高亮/点击展开） |
 | 15:30 | AI | 重写 | TopBar/ChatPanel/DetailPanel/App.vue — 全新设计系统 |
 | 15:30 | AI | 修复 | whisper 模型: ggml-silero 是 VAD，非 STT，需下载 ggml-base.bin |
+| 16:00 | AI | 配置 | 创建 `.env` 文件，后端 34 路由就绪 |
+| 16:00 | AI | 验证 | 登录/注册接口测试通过 (admin/admin123, 注册新用户) |
+| 16:00 | AI | 验证 | symptoms 接口因 Neo4j 未启动失败（预期），SQLite 独立工作 |
 
 ---
 
