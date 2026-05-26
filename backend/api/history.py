@@ -133,11 +133,13 @@ class SaveHistoryRequest(BaseModel):
 @router.post("/history/save")
 async def save_history(req: SaveHistoryRequest):
     conn = get_connection()
-    conn.execute("INSERT OR REPLACE INTO conversations (session_id, user_id, title, message_count, updated_at) VALUES (?,?,?,2,datetime('now'))",[req.session_id,req.user_id,req.title])
-    conn.execute("INSERT OR REPLACE INTO messages (message_id,session_id,role,content) VALUES (?||'_u',?,'user',?)",[req.session_id,req.session_id,req.user_msg])
-    conn.execute("INSERT OR REPLACE INTO messages (message_id,session_id,role,content) VALUES (?||'_a',?,'assistant',?)",[req.session_id,req.session_id,req.assistant_msg])
-    conn.commit();conn.close()
-    return {"status":"ok"}
+    uid = req.session_id
+    conn.execute("INSERT OR REPLACE INTO conversations (session_id, user_id, title, message_count, updated_at) VALUES (?,?,?,2,datetime('now'))", [uid, req.user_id if req.user_id else None, req.title])
+    conn.execute("INSERT OR REPLACE INTO messages (message_id, session_id, role, content) VALUES (?,?,?,?)", [uid + "_u", uid, "user", req.user_msg])
+    conn.execute("INSERT OR REPLACE INTO messages (message_id, session_id, role, content) VALUES (?,?,?,?)", [uid + "_a", uid, "assistant", req.assistant_msg])
+    conn.commit()
+    conn.close()
+    return {"status": "ok"}
 
 
 @router.delete("/history/batch")
