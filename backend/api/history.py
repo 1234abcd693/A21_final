@@ -122,6 +122,24 @@ class BatchDeleteRequest(BaseModel):
     session_ids: list[str]
 
 
+class SaveHistoryRequest(BaseModel):
+    session_id: str
+    title: str = ""
+    user_msg: str = ""
+    assistant_msg: str = ""
+    user_id: int = 0
+
+
+@router.post("/history/save")
+async def save_history(req: SaveHistoryRequest):
+    conn = get_connection()
+    conn.execute("INSERT OR REPLACE INTO conversations (session_id, user_id, title, message_count, updated_at) VALUES (?,?,?,2,datetime('now'))",[req.session_id,req.user_id,req.title])
+    conn.execute("INSERT OR REPLACE INTO messages (message_id,session_id,role,content) VALUES (?||'_u',?,'user',?)",[req.session_id,req.session_id,req.user_msg])
+    conn.execute("INSERT OR REPLACE INTO messages (message_id,session_id,role,content) VALUES (?||'_a',?,'assistant',?)",[req.session_id,req.session_id,req.assistant_msg])
+    conn.commit();conn.close()
+    return {"status":"ok"}
+
+
 @router.delete("/history/batch")
 async def batch_delete_history(req: BatchDeleteRequest):
     """批量删除会话"""
