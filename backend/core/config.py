@@ -26,7 +26,7 @@ class Settings:
     NEO4J_PASSWORD: str = os.getenv("NEO4J_PASSWORD", "a21password")
 
     # llama.cpp
-    LLAMA_SERVER_URL: str = os.getenv("LLAMA_SERVER_URL", "http://127.0.0.1:8080")
+    LLAMA_SERVER_URL: str = os.getenv("LLAMA_SERVER_URL", "http://127.0.0.1:8082")
 
     # Whisper
     WHISPER_SERVER_URL: str = os.getenv("WHISPER_SERVER_URL", "http://127.0.0.1:8081")

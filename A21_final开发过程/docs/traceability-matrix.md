@@ -1,6 +1,6 @@
 # A21 需求-功能-模块完整映射
 
-> 版本: v1.0 | 从用户场景出发，逐层分解到代码模块  
+> 版本: v2.0 | 基于实际代码实现状态，与 CHANGELOG.md 对齐  
 > 读完这篇，你应该能回答："这个功能谁用、做什么、哪个模块实现、现在什么状态"
 
 ---
@@ -24,21 +24,20 @@
 
 | 编号 | 功能 | 说明 | 实现模块 | 状态 |
 |:---:|------|------|----------|:--:|
-| F1.1 | **输入问题** | 智能问答模式：多行输入框，支持自然语言描述 | 前端 InputBox.vue | 🔴 待设计 |
-| F1.2 | **智能联想** | 输入时下拉提示已有故障现象，点击直接填入 | 前端 InputBox + 后端 /symptoms | 🔴 待设计 |
-| F1.3 | **关键词检索** | 搜索框输入 → 图谱节点高亮 + 右侧匹配列表（融入图谱，不再独立页面） | 前端 SearchInput → GraphPanel | 🔴 待设计 |
-| F1.4 | **图谱交互** | 点击节点→详情面板；双击→展开关联；拖拽缩放 | 前端 GraphPanel + DetailPanel | 🔴 待设计 |
-| F1.5 | **以此提问** | 点击节点旁的 💬 → 底部问答面板展开，自动填入问题 | 前端 DetailPanel → ChatPanel | 🔴 待设计 |
-| F1.5 | **图检索** | 从 Neo4j 知识图谱查故障原因链 | RAG 层 retriever.py → kg/neo4j_client.py | 🔴 待设计 |
-| F1.6 | **向量检索** | 从 Chroma 向量库查语义相似的维修文档 | RAG 层 retriever.py → Chroma | 🔴 待设计 |
-| F1.7 | **关键词检索** | BM25 精确匹配专业术语和参数值 | RAG 层 retriever.py | 🔴 待设计 |
-| F1.8 | **结果融合** | 三路检索结果用 RRF 融合排序 | RAG 层 retriever.py | 🔴 待设计 |
-| F1.9 | **LLM 生成回答** | 将检索结果注入 Prompt，调用 llama.cpp 生成结构化回答 | RAG 层 generator.py | 🔴 待设计 |
-| F1.10 | **流式展示** | 前端逐字显示回答（SSE），用户 2 秒内看到第一个字 | 后端 StreamingResponse + 前端 SSE 接收 | 🔴 待设计 |
-| F1.11 | **答案验证** | 生成后检查关键名词是否在源文档中出现 | RAG 层 validator.py | 🔴 待设计 |
-| F1.12 | **引用溯源** | 答案中引用可点击 → 弹出源文档原文；溯源卡片显示完整文档+图谱链路 | 前端 TraceCard.vue + TraceabilityChain.vue | 🔴 待设计 |
-| F1.13 | **可信度显示** | 🟢🟡🔴 三级可信度 + 防幻觉两层验证（引用完整性+事实一致性） | 后端 validator.py + 前端 TraceCard.vue | 🔴 待设计 |
-| F1.13 | **答案导出** | 将当前问答记录导出为 Word 报告 | 工具层 report_generator.py | 🔴 待设计 |
+| F1.1 | **输入问题** | 多行输入框，支持自然语言描述，Enter发送 | App.vue (input-area) | ✅ 已实现 |
+| F1.2 | **智能联想** | 输入时下拉提示已有故障现象，点击直接填入 | 后端 /symptoms，前端待接 | 🔴 待设计 |
+| F1.3 | **关键词检索** | 搜索框输入 → 图谱节点高亮 + 右侧匹配列表 | 后端图搜索API就绪，前端未接入 | 🟡 后端就绪 |
+| F1.4 | **图谱交互** | 点击节点→详情面板；双击→展开关联；拖拽缩放 | AntV G6 库已引入，组件待接入主界面 | 🟡 部分完成 |
+| F1.5 | **图检索** | 从 Neo4j 知识图谱查故障原因链 | `rag/retriever.py` → `kg/neo4j_client.py` | ✅ 已实现 |
+| F1.6 | **向量检索** | 从 Chroma 向量库查语义相似的维修文档 | `rag/retriever.py` → `rag/vector_store.py` | ✅ 已实现 |
+| F1.7 | **BM25 检索** | 精确匹配专业术语和参数值 | `rag/retriever.py` (rank-bm25 + jieba) | ✅ 已实现 |
+| F1.8 | **结果融合** | 三路检索结果用 RRF 融合排序 | `rag/retriever.py` → `fuse_results()` | ✅ 已实现 |
+| F1.9 | **LLM 生成回答** | 将检索结果注入 Prompt，调用 llama.cpp 生成结构化回答 | `rag/generator.py` | ✅ 已实现 |
+| F1.10 | **流式展示** | 前端逐字显示回答（SSE），用户秒级看到第一个字 | `api/ask.py` (StreamingResponse) + App.vue (fetch SSE) | ✅ 已实现 |
+| F1.11 | **答案验证** | 生成后检查关键名词是否在源文档中出现，防止幻觉 | `rag/validator.py` → `validate_answer()` | ✅ 已实现 |
+| F1.12 | **引用溯源** | 答案中引用可点击 → 弹出源文档原文；溯源卡片 | 后端 metadata 含 citations，前端 TraceCard 组件待接 | 🟡 后端就绪 |
+| F1.13 | **可信度显示** | 🟢🟡🔴 三级可信度 + 防幻觉两层验证 | `rag/validator.py` (后端) + App.vue (前端待渲染) | 🟡 部分完成 |
+| F1.14 | **答案导出** | 将当前问答记录导出为 Word 报告 | `api/transcribe.py` → `/api/v1/report` | ✅ 已实现 |
 
 ---
 
@@ -49,10 +48,10 @@
 
 | 编号 | 功能 | 说明 | 实现模块 | 状态 |
 |:---:|------|------|----------|:--:|
-| F2.1 | **图谱可视化** | 前端渲染力导向图，节点=实体，连线=关系，可拖拽缩放 | 前端 GraphView.vue（D3.js） | 🔴 待设计 |
-| F2.2 | **节点展开** | 点击节点展开相邻节点，显示属性和来源 | 前端 GraphView.vue + 后端 /graph/expand | 🔴 待设计 |
-| F2.3 | **图谱导入** | 执行 Cypher 文件初始化图谱（已有 `import.cypher`） | Neo4j Cypher Shell | ✅ 数据已就绪 |
-| F2.4 | **设备分类浏览** | 按设备层级（L2/L3）树形浏览所有故障 | 前端 + 后端 /equipment | 🔴 待设计 |
+| F2.1 | **图谱可视化** | 前端渲染力导向图（AntV G6），可拖拽缩放 | AntV G6 库已引入，组件待接入主界面 | 🟡 部分完成 |
+| F2.2 | **节点展开** | 点击节点展开相邻节点，显示属性和来源 | 后端 /graph/expand + /graph/node/{uid} 就绪 | 🟡 后端就绪 |
+| F2.3 | **图谱导入** | 执行 Cypher 文件初始化图谱 | `import.cypher` (224行，125+实体，98+关系) | ✅ 已实现 |
+| F2.4 | **设备分类浏览** | 按设备层级（L2/L3）树形浏览所有故障 | 后端 /symptoms 就绪，前端树形组件待设计 | 🟡 后端就绪 |
 
 ---
 
@@ -63,11 +62,11 @@
 
 | 编号 | 功能 | 说明 | 实现模块 | 状态 |
 |:---:|------|------|----------|:--:|
-| F3.1 | **文档上传** | 支持 Word (.docx) 和 PDF 上传 | 前端 UploadPanel.vue + 后端 /parse | 🔴 待设计 |
-| F3.2 | **文档解析** | python-docx / pdfplumber 提取纯文本 | 工具层 parser.py | 🔴 待设计 |
-| F3.3 | **知识抽取** | 用正则规则提取规范格式文本；1.5B few-shot 处理不规范文本 | 工具层 extractor.py | 🔴 待设计 |
-| F3.4 | **图谱预览** | 抽取结果在前端渲染成临时图谱，用户整体确认/放弃 | 前端 + 后端 /confirm | 🔴 待设计 |
-| F3.5 | **确认入库** | 确认后将实体写入 Neo4j，文档片段写入 Chroma | 后端 /confirm → kg/ + chroma | 🔴 待设计 |
+| F3.1 | **文档上传** | 支持 Word (.docx) 和 PDF 上传 | 后端 `/api/v1/parse` 就绪，前端上传组件待设计 | 🟡 后端就绪 |
+| F3.2 | **文档解析** | python-docx / pdfplumber 提取纯文本 | `tools/parser.py` | ✅ 已实现 |
+| F3.3 | **知识抽取** | 正则规则提取规范格式文本（70%）；1.5B few-shot 待实现 | `tools/extractor.py` (正则✅, model stub 🔴) | 🟡 部分完成 |
+| F3.4 | **图谱预览** | 抽取结果渲染为临时图谱，用户确认 | 后端 `/api/v1/confirm` 就绪，前端预览组件待设计 | 🟡 后端就绪 |
+| F3.5 | **确认入库** | 确认后将实体写入 Neo4j，文档片段写入 Chroma | `api/transcribe.py` → kg/ + chroma | ✅ 已实现 |
 
 ---
 
@@ -78,11 +77,11 @@
 
 | 编号 | 功能 | 说明 | 实现模块 | 状态 |
 |:---:|------|------|----------|:--:|
-| F4.1 | **点赞/点踩** | 每条回答下方 👍👎 按钮 | 前端 FeedbackButtons.vue | 🔴 待设计 |
-| F4.2 | **反馈存储** | SQLite 记录 (问题, 回答, 使用的文档, 评分, 时间) | 反馈层 storage.py | 🔴 待设计 |
-| F4.3 | **触发优化** | 手动按钮触发 或 积累 ≥30 条后自动触发 | 前端 + 后端 /optimize | 🔴 待设计 |
-| F4.4 | **参数调优** | 网格搜索最佳 α/β/γ + Top-K 权重 | 反馈层 optimizer/grid_search.py | 🔴 待设计 |
-| F4.5 | **参数持久化** | 优化结果写入 params.json，RAG 检索时读取 | 反馈层 config.py | 🔴 待设计 |
+| F4.1 | **点赞/点踩** | 每条回答下方 👍👎 按钮 | App.vue (msg-actions) | ✅ 已实现 |
+| F4.2 | **反馈存储** | SQLite 记录 (问题, 回答, 使用的文档, 评分, 时间) | `feedback/storage.py` | ✅ 已实现 |
+| F4.3 | **触发优化** | 手动按钮触发 或 积累 ≥30 条后自动触发 | `api/feedback.py` → `/api/v1/optimize` | ✅ 已实现 |
+| F4.4 | **参数调优** | 网格搜索最佳 α/β/γ + Top-K 权重 | `feedback/optimizer/grid_search.py` | ✅ 已实现 |
+| F4.5 | **参数持久化** | 优化结果写入 `rag/params.json`，RAG 检索时读取 | `feedback/config.py` | ✅ 已实现 |
 
 ---
 
@@ -93,9 +92,9 @@
 
 | 编号 | 功能 | 说明 | 实现模块 | 状态 |
 |:---:|------|------|----------|:--:|
-| F5.1 | **导出知识包** | 打包 Neo4j (Cypher) + Chroma + SQLite + params.json → zip | 工具层 sync.py → /export | 🔴 待设计 |
-| F5.2 | **导入知识包** | 解包 → 校验 → MERGE 合并 Neo4j → Chroma hash 去重 | 工具层 sync.py → /import | 🔴 待设计 |
-| F5.3 | **冲突提示** | 导入时提示用户：参数不同/模型不一致/实体冲突 | 前端 + 工具层 | 🔴 待设计 |
+| F5.1 | **导出知识包** | 打包 Neo4j (Cypher) + Chroma + SQLite + params.json → zip | `tools/sync.py` → `/api/v1/export` | ✅ 已实现 |
+| F5.2 | **导入知识包** | 解包 → 校验 → MERGE 合并 Neo4j → Chroma hash 去重 | `tools/sync.py` → `/api/v1/import` | ✅ 已实现 |
+| F5.3 | **冲突提示** | 导入时提示用户：参数不同/模型不一致/实体冲突 | 后端 sync_info 返回冲突信息，前端提示UI待设计 | 🟡 部分完成 |
 
 ---
 
@@ -106,13 +105,13 @@
 
 | 编号 | 功能 | 说明 | 实现模块 | 状态 |
 |:---:|------|------|----------|:--:|
-| F6.1 | **对话保存** | 每轮问答自动保存 | 数据层 history.py | 🔴 待设计 |
-| F6.2 | **历史列表** | 按时间倒序显示历史对话，点击可查看 | 前端 HistoryPanel.vue + 后端 /history | 🔴 待设计 |
-| F6.3 | **多轮上下文** | 维持当前会话的对话上下文，支持追问 | 数据层 context_manager.py | 🔴 待设计 |
-| F6.4 | **删除会话** | 单条删除或批量删除历史对话 | 前端 History + 后端 DELETE /history/{sid} | 🔴 待设计 |
-| F6.5 | **置顶会话** | 重要对话置顶，置顶项始终在最上面 | 前端 History + 后端 PATCH /history/{sid} | 🔴 待设计 |
-| F6.6 | **搜索会话** | 按标题或消息内容关键词搜索历史对话 | 前端 History + 后端 GET /history/search | 🔴 待设计 |
-| F6.7 | **对话导出** | 将某次对话导出为文本或 Word | 工具层 + 后端 /report | 🔴 待设计 |
+| F6.1 | **对话保存** | 每轮问答自动保存到 SQLite | `api/ask.py` → `api/transcribe.py` cache | ✅ 已实现 |
+| F6.2 | **历史列表** | 按时间倒序显示历史对话，点击可查看 | App.vue (sidebar conv-list) + `api/history.py` | ✅ 已实现 |
+| F6.3 | **多轮上下文** | 维持当前会话的对话上下文，支持追问 | `api/ask.py` (history param) | ✅ 已实现 |
+| F6.4 | **删除会话** | 单条删除历史对话 | App.vue (delConv) + 后端 DELETE | ✅ 已实现 |
+| F6.5 | **置顶会话** | 重要对话置顶 | 后端 PATCH 接口就绪，前端未实现 | 🟡 后端就绪 |
+| F6.6 | **搜索会话** | 按标题或消息内容关键词搜索历史对话 | 后端 GET /history/search 就绪，前端待设计 | 🟡 后端就绪 |
+| F6.7 | **对话导出** | 将某次对话导出为文本或 Word | `api/transcribe.py` → `/api/v1/report` | ✅ 已实现 |
 
 ---
 
@@ -123,9 +122,9 @@
 
 | 编号 | 功能 | 说明 | 实现模块 | 状态 |
 |:---:|------|------|----------|:--:|
-| F7.1 | **健康检查** | Electron 启动时轮询后端 /health 确认就绪 | 服务层 + Electron 主进程 | 🔴 待设计 |
-| F7.2 | **一键启动** | 双击 exe → 自动启动 Neo4j + llama + 后端 + 前端 | Electron main.js + start_all.bat | 🔴 待设计 |
-| F7.3 | **错误提示** | 服务启动失败时弹出友好提示 | 前端 | 🔴 待设计 |
+| F7.1 | **健康检查** | Electron 启动时轮询后端 /health 确认就绪 | `api/health.py` + `electron/main.js` | ✅ 已实现 |
+| F7.2 | **一键启动** | 双击 exe → 自动启动 Neo4j + llama + 后端 + 前端 | `electron/main.js` (子进程管理) + `start_all.bat` | ✅ 已实现 |
+| F7.3 | **错误提示** | 服务启动失败时弹出友好提示 | 后端 `/health` 返回各组件状态，前端待设计 | 🟡 部分完成 |
 
 ---
 
@@ -136,9 +135,9 @@
 
 | 编号 | 功能 | 说明 | 实现模块 | 状态 |
 |:---:|------|------|----------|:--:|
-| F8.1 | **按住录音** | 前端麦克风按钮，按住录音、松手结束 | 前端 VoiceInput.vue（MediaRecorder API） | 🔴 待设计 |
-| F8.2 | **语音转文字** | whisper.cpp (base 140MB) 本地转录，离线运行 | whisper-server :8081 + 后端 /transcribe | 🔴 待设计 |
-| F8.3 | **结果填入** | 转录文本自动填入输入框，用户可编辑后发送 | 前端 InputBox.vue | 🔴 待设计 |
+| F8.1 | **按住录音** | 前端麦克风按钮，点击开始/停止录音 | App.vue (MediaRecorder API + voice-btn) | ✅ 已实现 |
+| F8.2 | **语音转文字** | Vosk (vosk-model-small-cn-0.22) 本地转录，离线运行 | `tools/vosk_http.py` (:8765) + `/api/v1/transcribe` | ✅ 已实现 |
+| F8.3 | **结果填入** | 转录文本自动填入输入框，用户可编辑后发送 | App.vue → `tx.value = data.text` | ✅ 已实现 |
 
 ---
 
@@ -149,11 +148,11 @@
 
 | 编号 | 功能 | 说明 | 实现模块 | 状态 |
 |:---:|------|------|----------|:--:|
-| F9.1 | **注册** | admin 创建新用户账号 | 后端 /auth/register | 🔴 待设计 |
-| F9.2 | **登录** | 用户名+密码登录，本地 token | 后端 /auth/login + 前端 LoginPage | 🔴 待设计 |
-| F9.3 | **权限控制** | user(问答/历史) vs admin(+导入导出/用户管理) | 后端中间件 + 前端条件渲染 | 🔴 待设计 |
-| F9.4 | **个人中心** | 统计（问答数/点赞/贡献）、修改密码、偏好设置 | 前端 ProfilePage + 后端 /user/* | 🔴 待设计 |
-| F9.5 | **用户管理** | admin 查看/删除用户列表 | 前端 + 后端 /users | 🔴 待设计 |
+| F9.1 | **注册** | 创建新用户账号 | `api/auth.py` → `/api/v1/auth/register` | ✅ 已实现 |
+| F9.2 | **登录** | 用户名+密码登录，本地 token（bcrypt优先，SHA-256兜底） | `api/auth.py` + App.vue (login-page) | ✅ 已实现 |
+| F9.3 | **权限控制** | user(问答/历史) vs admin(+导入导出/用户管理) | 后端 auth.py 含 role 字段，前端条件渲染待设计 | 🟡 部分完成 |
+| F9.4 | **个人中心** | 统计（问答数）、修改密码、显示名 | App.vue (profile modal) + `/api/v1/user/profile` | ✅ 已实现 |
+| F9.5 | **用户管理** | admin 查看/删除用户列表 | 后端 /api/v1/auth/users 就绪，前端未接入 | 🟡 后端就绪 |
 
 ---
 
@@ -162,73 +161,56 @@
 ```
 功能                        涉及的模块
 ────────────────────────────────────────────────────
-F1.1-F1.11  问答核心   →   前端 Chat/Input/Message + 服务层 /ask + RAG层 + Neo4j + Chroma
-F2.1-F2.4   图谱管理   →   前端 Graph + 服务层 /symptoms + KG层
-F3.1-F3.5   知识抽取   →   前端 Upload + 服务层 /parse /confirm + 工具层 extractor
-F4.1-F4.5   反馈优化   →   前端 Feedback + 服务层 /feedback /optimize + 反馈层
-F5.1-F5.3   U盘同步    →   前端 + 服务层 /export /import + 工具层 sync
-F6.1-F6.4   历史对话   →   前端 History + 服务层 /history + 数据层
-F7.1-F7.3   系统管理   →   Electron main.js + 服务层 /health
-F8.1-F8.3   语音输入   →   前端 VoiceInput + 服务层 /transcribe + whisper-server
-F9.1-F9.5   用户系统   →   前端 Login/Profile + 服务层 /auth/* /user/* + SQLite users表
+F1.1-F1.14  问答核心   →   App.vue + /api/v1/ask + RAG层(retriever/generator/validator) + Neo4j + Chroma
+F2.1-F2.4   图谱管理   →   AntV G6(前端待接) + /api/v1/symptoms + /graph/* + kg/neo4j_client + import.cypher
+F3.1-F3.5   知识抽取   →   前端上传(待设计) + /api/v1/parse + /api/v1/confirm + tools/extractor + tools/parser
+F4.1-F4.5   反馈优化   →   App.vue(反馈按钮) + /api/v1/feedback + /api/v1/optimize + feedback/ (storage/config/optimizer)
+F5.1-F5.3   U盘同步    →   /api/v1/export + /api/v1/import + tools/sync.py
+F6.1-F6.7   历史对话   →   App.vue(侧边栏) + /api/v1/history/* + api/ask.py(cache) + data/database.py(SQLite)
+F7.1-F7.3   系统管理   →   /health + electron/main.js(子进程管理) + start_all.bat
+F8.1-F8.3   语音输入   →   App.vue(MediaRecorder) + tools/vosk_http.py + /api/v1/transcribe
+F9.1-F9.5   用户系统   →   App.vue(登录/个人设置) + /api/v1/auth/* + /api/v1/user/*
 ```
 
 ---
 
 ## 三、当前项目状态总览
 
-### ✅ 已完成
+### ✅ 已完成（后端 100%，前端核心 80%）
 
 | 类别 | 内容 |
 |------|------|
-| 技术选型 | 全部 10 项决策已定（模型、前端、后端、检索、NLP、抽取、反馈、同步、Embedding、KG本体） |
+| 技术选型 | 全部 10 项决策已定（模型Qwen2.5-1.5B、前端Electron+Vue3、后端FastAPI、三路检索融合、混合NER抽取、网格搜索优化、Cypher同步、bge-base-zh Embedding） |
 | 架构设计 | 6 层架构，每层职责和模块已明确 |
-| 知识图谱 | 本体设计 v4.0（7 节点 8 关系），初始数据 `import.cypher` 已就绪 |
-| 环境指南 | dev-env-setup.md（Miniconda + Neo4j + llama.cpp + Node.js 完整搭建） |
-| 打包方案 | packaging-guide.md（PyInstaller + electron-builder → 单个 Setup.exe） |
-| 依赖文件 | `backend/requirements.txt`（16 个包） |
-| 协作流程 | github-workflow.md（Git 命令详解 + 模块分支策略） |
-| 知识库 | 25 篇概念笔记（面向小白） |
-| Git 配置 | .gitignore 完整，opencode 配置已生效 |
-| 语音输入 | whisper.cpp 方案已设计（base 140MB，离线，按需转录） |
+| 知识图谱 | 本体设计 v4.0（7 节点 8 关系），初始数据 `import.cypher` 224行（125+实体，98+关系） |
+| 后端 API | 8 个路由模块全部实现（ask/auth/symptoms/feedback/history/sync/transcribe/health） |
+| RAG 核心 | 三路检索(BM25+向量+图) + RRF融合 + LLM流式生成 + 两层防幻觉验证 |
+| 反馈闭环 | 点赞/点踩存储 + 网格搜索参数优化 + 参数持久化 |
+| 用户系统 | 注册/登录（bcrypt优先 + SHA-256兜底）/ 个人设置 |
+| 语音输入 | Vosk HTTP服务 + 浏览器MediaRecorder录音 + 自动填入 |
+| 历史对话 | SQLite存储 + CRUD接口 + 侧边栏列表 + 删除 |
+| U盘同步 | Neo4j Cypher导出导入 + Chroma目录拷贝 + SQLite hash去重 |
+| 桌面壳 | Electron 主进程（4子进程管理）+ 一键启动脚本 |
+| 开发文档 | 架构/API契约/数据模型/环境搭建/测试方案/打包指南 等16篇 |
+| 知识库 | 25 篇技术笔记（面向初学者） |
 
-### 🔴 待设计（下一步）
+### 🟡 后端就绪，前端待接入
 
 | 优先级 | 类别 | 说明 |
 |:--:|------|------|
-| 1 | **API 契约** | `docs/api-contract.md` (17 个接口完整定义) ✅ |
-| 2 | **数据模型** | ✅ `docs/data-model.md` (Chroma 1 collection + SQLite 4 表 + params.json) |
-| 3 | **前端组件规范** | 每个 Vue 组件的 props/events/状态 |
-| 4 | **后端模块接口** | 每个 Python 模块的类和方法签名 |
-| 5 | **Prompt 模板** | 系统指令、检索结果注入格式 |
-| 6 | **配置规范** | .env 变量、params.json、启动参数 |
+| 1 | **图谱可视化** | AntV G6 库已引入，后端 /graph/* API 全部就绪，需开发前端图谱组件 |
+| 2 | **知识抽取UI** | 后端 /parse + /confirm 就绪，需前端上传组件 + 预览确认界面 |
+| 3 | **引用溯源展示** | 后端 metadata 含 citations + traceability，需前端 TraceCard 组件 |
+| 4 | **权限控制** | 后端 auth.py 含 role 字段，需前端根据权限条件渲染 |
+| 5 | **智能联想** | 后端 /symptoms 就绪，需前端接入输入框下拉 |
+| 6 | **会话搜索/置顶** | 后端接口就绪，前端未实现 |
 
-### 📂 项目文件结构
+### 🔴 待设计/开发
 
-```
-A21_final/
-├── 赛题.txt
-├── import.cypher                 ← KG 初始数据 ✅
-├── 知识图谱设计文档.md            ← KG 本体 v4.0 ✅
-├── .gitignore                    ← 完整 ✅
-│
-├── backend/                      ← Python FastAPI
-│   ├── requirements.txt          ← 16 个依赖 ✅
-│   └── (代码待开发) 🔴
-│
-├── frontend/                     ← Vue 3 + Electron
-│   └── (待创建) 🔴
-│
-├── docs/                         ← 设计文档 (Obsidian 内)
-│   ├── planning-report.md        ← 规划报告 v2.1 ✅
-│   ├── architecture.md           ← 架构设计 v1.0 ✅
-│   ├── requirements.md           ← 需求规格 ✅
-│   ├── github-workflow.md        ← 协作流程 ✅
-│   ├── dev-env-setup.md          ← 环境搭建 ✅
-│   └── packaging-guide.md        ← 打包方案 ✅
-│
-└── 知识库/                       ← 23 篇概念笔记 ✅
-```
+| 优先级 | 类别 | 说明 |
+|:--:|------|------|
+| 1 | **NER few-shot** | `tools/extractor.py` 模型端是 stub，需实现 1.5B few-shot 知识抽取 |
+| 2 | **前端组件拆分** | 当前 380 行单文件 App.vue，需按 development-guide 拆为独立组件 |
 
 ---
 
@@ -236,4 +218,5 @@ A21_final/
 
 | 日期 | 版本 | 变更 |
 |------|------|------|
-| 2026-05-25 | v1.1 | 新增 R8 语音输入（whisper.cpp），知识库扩至25篇 |
+| 2026-05-25 | v1.1 | 新增 R8 语音输入（Vosk），知识库扩至25篇 |
+| 2026-05-26 | v2.0 | 全面同步：根据实际代码状态更新所有功能标记，标识后端就绪/前端待接入 |

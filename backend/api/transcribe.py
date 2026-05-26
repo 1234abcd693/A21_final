@@ -2,14 +2,15 @@
 语音转文字 + 文档解析 + 确认导入 + 报告导出
 """
 
-import os
 import json
+import logging
+import os
 import tempfile
 import uuid
 from typing import Optional
 
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
 from pydantic import BaseModel
 
 from tools.parser import parse_file
@@ -17,6 +18,7 @@ from tools.extractor import extract_knowledge
 from core.config import settings
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 # ---- 对话消息缓存（feedback 需要 question/answer 上下文） ----
 # 实际生产应存数据库，这里用内存缓存
@@ -48,6 +50,7 @@ async def transcribe(audio: UploadFile = File(...)):
                 )
             result = resp.json() if resp.status_code == 200 else {"text": ""}
     except Exception:
+        logger.exception("Transcription request failed")
         result = {"text": ""}
     finally:
         if os.path.exists(tmp_path):
@@ -140,7 +143,7 @@ async def confirm_import(req: ConfirmRequest):
                             )
                             relationships_added += 1
                         except Exception:
-                            pass
+                            logger.exception("Relationship creation failed: %s->%s (%s)", uid, target_uid, rel_type)
 
                 # 收集 Chroma 数据
                 description = (
@@ -167,7 +170,7 @@ async def confirm_import(req: ConfirmRequest):
             )
             chroma_added = len(chroma_chunks)
         except Exception:
-            pass
+            logger.exception("Chroma chunk insertion failed (%d chunks)", len(chroma_chunks))
 
     return {
         "status": "ok",

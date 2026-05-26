@@ -1,5 +1,11 @@
 """
 Chroma 向量库初始化和操作
+
+嵌入模型：bge-base-zh-v1.5（768维）
+    - 写入：add_chunks() 需外部预计算 embedding 后调用 collection.add(embeddings=...)
+    - 查询：search() 内部用 bge-base-zh-v1.5 编码查询文本，传 query_embeddings 给 ChromaDB
+    - 为什么不用 ChromaDB 内置 embedding function：内置默认是 all-MiniLM-L6-v2（384维），
+      与 bge 768维不兼容，会导致 "Embedding dimension 384 does not match 768" 错误。
 """
 
 from typing import Any, Optional
@@ -11,6 +17,7 @@ from core.config import settings
 
 _client: Optional[Any] = None
 _collection: Optional[Any] = None
+_embedder: Optional[Any] = None  # bge-base-zh-v1.5 SentenceTransformer（惰性加载）
 
 
 def _get_client() -> Any:
@@ -26,6 +33,15 @@ def _get_client() -> Any:
     return _client
 
 
+def _get_embedder() -> Any:
+    """惰性加载 bge-base-zh-v1.5 嵌入模型（768维），用于查询时编码。"""
+    global _embedder
+    if _embedder is None:
+        from sentence_transformers import SentenceTransformer
+        _embedder = SentenceTransformer(settings.EMBEDDING_MODEL)
+    return _embedder
+
+
 def _get_collection() -> Any:
     """获取或创建 knowledge_chunks collection"""
     global _collection
@@ -36,6 +52,7 @@ def _get_collection() -> Any:
             metadata={
                 "description": "船舶故障诊断知识库",
                 "embedding_model": settings.EMBEDDING_MODEL,
+                "hnsw:space": "cosine",  # bge 用 L2 归一化 → 余弦距离
             },
         )
     return _collection
@@ -55,7 +72,7 @@ def add_chunks(
     documents: list[str],
     metadatas: list[dict[str, Any]],
 ) -> None:
-    """批量添加文档切片"""
+    """批量添加文档切片（需调用方预计算 embedding 并作为 embeddings= 参数传入）"""
     if not ids:
         return
     _get_collection().add(ids=ids, documents=documents, metadatas=metadatas)
@@ -67,11 +84,20 @@ def search(
     where: Optional[dict] = None,
 ) -> list[dict[str, Any]]:
     """
-    语义检索。
+    语义检索 — 用 bge-base-zh-v1.5 编码查询，传 query_embeddings 给 ChromaDB。
+
     返回 [{chunk_id, doc_name, page, text, score}, ...]
     """
     coll = _get_collection()
-    kwargs = {"query_texts": [query], "n_results": n_results}
+
+    # 用 bge-base-zh-v1.5 编码查询文本（768维），避免 ChromaDB 默认 384维 的不匹配
+    embedder = _get_embedder()
+    query_embedding = embedder.encode(query, normalize_embeddings=True).tolist()
+
+    kwargs: dict[str, Any] = {
+        "query_embeddings": [query_embedding],
+        "n_results": n_results,
+    }
     if where:
         kwargs["where"] = where
     result = coll.query(**kwargs)

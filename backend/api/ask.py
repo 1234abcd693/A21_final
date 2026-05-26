@@ -1,21 +1,17 @@
 """
 问答路由 (POST /api/v1/ask — SSE 流式)
+v2.1: 立即返回 thinking 状态，消除白屏等待；验证仅出现在 metadata 中
 """
 
 import json
-import uuid
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from rag.generator import ask_stream
-from rag.validator import validate_answer, format_warning
-
 router = APIRouter()
 
-# 消息缓存（feedback 提交时需要完整上下文）
 _message_cache: dict[str, dict] = {}
 
 
@@ -37,11 +33,15 @@ async def ask(req: AskRequest):
 
     async def event_generator():
         full_answer = ""
-        citations = []
         message_id = ""
         retrieved_chunks_str = "[]"
 
         try:
+            # 立即返回思考状态，用户立刻看到反馈
+            yield "event: status\ndata: thinking\n\n"
+
+            from rag.generator import ask_stream
+
             async for event in ask_stream(
                 question=req.question,
                 mode=req.mode,
@@ -51,23 +51,20 @@ async def ask(req: AskRequest):
             ):
                 if event["type"] == "token":
                     full_answer += event["token"]
-                    yield f"data: {event['token']}\n\n"
+                    # JSON 编码 token，确保 \n 等特殊字符不被 SSE 协议吃掉
+                    yield f"data: {json.dumps(event['token'], ensure_ascii=False)}\n\n"
                 elif event["type"] == "metadata":
-                    citations = event.get("citations", [])
                     message_id = event.get("message_id", "")
                     retrieved_chunks_str = event.get("retrieved_chunks", "[]")
-                    chunks = json.loads(retrieved_chunks_str) if isinstance(retrieved_chunks_str, str) else []
-                    validation = validate_answer(full_answer, citations, chunks)
-                    warning = format_warning(validation["confidence"])
 
-                    if warning:
-                        full_answer += f"\n\n{warning}"
-                        yield f"data: {warning}\n\n"
+                    from rag.validator import validate_answer
+                    citations = event.get("citations", [])
+                    chunks_raw = json.loads(retrieved_chunks_str) if isinstance(retrieved_chunks_str, str) else []
+                    validation = validate_answer(full_answer, citations, chunks_raw)
+                    event["validation"] = validation
 
-                    event["traceability"] = validation
                     yield f"event: metadata\ndata: {json.dumps(event, ensure_ascii=False)}\n\n"
 
-            # 缓存消息（供 feedback 使用）
             if message_id:
                 from api.transcribe import cache_message
                 cache_message(message_id, req.question, full_answer, retrieved_chunks_str)

@@ -3,6 +3,7 @@ U盘数据同步（导出/导入）
 """
 
 import json
+import logging
 import os
 import shutil
 import tempfile
@@ -13,6 +14,8 @@ from typing import Any
 
 from core.config import settings
 from data.database import get_connection
+
+logger = logging.getLogger(__name__)
 
 
 def export_data(output_path: str) -> dict[str, Any]:
@@ -112,7 +115,7 @@ def import_data(zip_path: str) -> dict[str, Any]:
                             session.run(statement)
                             cypher_imported += 1
                         except Exception:
-                            pass
+                            logger.exception("Cypher statement import failed: %s...", statement[:80])
 
         # Chroma 合并（简单覆盖）
         chroma_src = extract_dir / "chroma_db"
@@ -139,9 +142,9 @@ def import_data(zip_path: str) -> dict[str, Any]:
                                 list(row),
                             )
                         except Exception:
-                            pass
+                            logger.exception("SQLite row insert failed for table '%s'", table)
                 except Exception:
-                    pass
+                    logger.exception("SQLite table import failed for table '%s'", table)
             src_conn.close()
             conn.commit()
             conn.close()

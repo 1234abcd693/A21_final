@@ -1,0 +1,25 @@
+[tool.ruff]
+# Python 代码规范配置
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (未使用的导入、未定义的变量等)
+    "I",   # isort (导入排序)
+    "N",   # pep8-naming (命名规范)
+    "B",   # flake8-bugbear (常见 bug 模式)
+    "UP",  # pyupgrade (建议使用新版语法)
+]
+ignore = [
+    "E501",  # 行长度由 line-length 控制
+    "B008",  # 允许在函数参数中调用函数
+]
+exclude = ["__pycache__", ".venv", "venv", "dist", "build"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
