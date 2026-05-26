@@ -110,9 +110,11 @@ def search(
                 "chunk_id": chunk_id,
                 "text": (result.get("documents", [[]])[0] or [""])[i],
                 "score": (result.get("distances", [[]])[0] or [0])[i] if result.get("distances") else 0,
-                "doc_name": meta.get("doc_name", ""),
-                "page": meta.get("page", ""),
-                "doc_type": meta.get("doc_type", ""),
+                "doc_name": meta.get("entity_name", meta.get("doc_name", "")),
+                "page": meta.get("source_page", meta.get("page", "")),
+                "doc_type": meta.get("source", meta.get("doc_type", "")),
+                "entity_uid": meta.get("entity_uid", ""),
+                "entity_label": meta.get("entity_label", ""),
                 "graph_entities": meta.get("graph_entities", []),
             })
     return output
