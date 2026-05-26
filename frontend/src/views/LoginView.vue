@@ -45,7 +45,8 @@ async function login() {
   loading.value = true; error.value = ''
   try {
     const { data } = await authAPI.login({ username: username.value, password: password.value })
-    if (remember.value) localStorage.setItem('a21_token', data.token)
+    localStorage.setItem('a21_token', data.token)
+    if (remember.value) localStorage.setItem('a21_auto', username.value + ':' + password.value)
     localStorage.setItem('a21_user', JSON.stringify(data.user))
     emit('login-success', data)
   } catch (e) {

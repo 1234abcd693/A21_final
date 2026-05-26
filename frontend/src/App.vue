@@ -33,13 +33,27 @@ import ChatPanel from './components/ChatPanel.vue'
 import LoginView from './views/LoginView.vue'
 import ProfileView from './views/ProfileView.vue'
 import AdminView from './views/AdminView.vue'
-import { graphAPI } from './api/index.js'
+import { graphAPI, authAPI } from './api/index.js'
 
 const view = ref(localStorage.getItem('a21_token') ? 'home' : 'login')
 const chatVisible = ref(false)
 const highlightNodes = ref([])
 const selectedNode = ref(null)
 const graphRef = ref(null)
+
+// 自动验证已有 token（后端重启后 session 丢失则退到登录）
+if (localStorage.getItem('a21_token')) {
+  authAPI.me(localStorage.getItem('a21_token')).catch(() => {
+    const auto = localStorage.getItem('a21_auto')
+    if (auto) {
+      const [u, p] = auto.split(':')
+      authAPI.login({ username: u, password: p }).then(({ data }) => {
+        localStorage.setItem('a21_token', data.token)
+        localStorage.setItem('a21_user', JSON.stringify(data.user))
+      }).catch(() => { view.value = 'login' })
+    } else { view.value = 'login' }
+  })
+}
 
 function onLogin(data) {
   view.value = 'home'
