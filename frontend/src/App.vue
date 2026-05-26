@@ -46,27 +46,78 @@
       @toggle-profile="showProfile = !showProfile"
     />
 
-    <!-- 聊天主区域 -->
-    <main class="chat-area">
-      <ChatPanel
-        :messages="messages"
-        :streaming="streaming"
-        :thinking="thinking"
-        :stream-text="streamText"
-        @rate="rateMsg"
-        @example-click="handleExampleClick"
-      />
-      <InputBox
-        v-model="tx"
-        :streaming="streaming"
-        :recording="recording"
-        :rec-time="recTime"
-        @send="send"
-        @toggle-voice="toggleVoice"
-      />
-    </main>
+    <!-- 主区域 + 顶部 Tab 导航 -->
+    <div class="main-area">
+      <!-- Tab 导航栏 -->
+      <nav class="tab-bar">
+        <button v-for="t in tabs" :key="t.id" :class="['tab-btn', { active: activeTab === t.id }]" @click="switchTab(t.id)">
+          {{ t.icon }} {{ t.label }}
+        </button>
+      </nav>
 
-    <!-- 个人设置弹窗（Teleport 到 body，内部处理） -->
+      <!-- Q&A Tab -->
+      <div v-show="activeTab === 'chat'" class="chat-area">
+        <ChatPanel
+          :messages="messages"
+          :streaming="streaming"
+          :thinking="thinking"
+          :stream-text="streamText"
+          @rate="rateMsg"
+          @example-click="handleExampleClick"
+        />
+        <InputBox
+          v-model="tx"
+          :streaming="streaming"
+          :recording="recording"
+          :rec-time="recTime"
+          @send="send"
+          @toggle-voice="toggleVoice"
+        />
+      </div>
+
+      <!-- KG Tab -->
+      <div v-show="activeTab === 'graph'" class="tab-content">
+        <GraphTab />
+      </div>
+
+      <!-- History Tab -->
+      <div v-show="activeTab === 'history'" class="tab-content">
+        <HistoryTab />
+      </div>
+
+      <!-- Import Tab -->
+      <div v-show="activeTab === 'import'" class="tab-content">
+        <ImportTab />
+      </div>
+
+      <!-- Profile Tab -->
+      <div v-show="activeTab === 'profile'" class="tab-content">
+        <div class="profile-page">
+          <h2>个人中心</h2>
+          <div class="pf-field">
+            <label>用户名</label>
+            <input :value="userName" disabled class="inp" />
+          </div>
+          <div class="pf-field">
+            <label>显示名称</label>
+            <input v-model="dispName" class="inp" />
+          </div>
+          <div class="pf-field">
+            <label>新密码（留空不修改）</label>
+            <input v-model="newPass" type="password" class="inp" placeholder="输入新密码" />
+          </div>
+          <button @click="saveProfile" class="btn-primary">保存设置</button>
+          <button @click="doLogout" class="btn-outline" style="margin-left:10px">退出登录</button>
+        </div>
+      </div>
+
+      <!-- Admin Tab -->
+      <div v-show="activeTab === 'admin'" class="tab-content">
+        <AdminPanel />
+      </div>
+    </div>
+
+    <!-- 个人设置弹窗 -->
     <ProfileModal
       v-model="showProfile"
       v-model:disp-name="dispName"
@@ -87,6 +138,10 @@ import SideMenu from './components/SideMenu.vue'
 import ChatPanel from './components/ChatPanel.vue'
 import InputBox from './components/InputBox.vue'
 import ProfileModal from './components/ProfileModal.vue'
+import GraphTab from './components/GraphTab.vue'
+import HistoryTab from './components/HistoryTab.vue'
+import ImportTab from './components/ImportTab.vue'
+import AdminPanel from './components/AdminPanel.vue'
 
 // ==================== 认证状态 ====================
 const loggedIn = ref(!!localStorage.getItem('a21_token'))
@@ -119,6 +174,18 @@ let recTimer = null
 const showProfile = ref(false)
 const dispName = ref('')
 const newPass = ref('')
+
+// ==================== Tab 导航 ====================
+const activeTab = ref('chat')
+const tabs = [
+  { id: 'chat', label: '问答', icon: '💬' },
+  { id: 'graph', label: '知识图谱', icon: '🔗' },
+  { id: 'history', label: '历史管理', icon: '📋' },
+  { id: 'import', label: '导入数据', icon: '📥' },
+  { id: 'profile', label: '个人中心', icon: '👤' },
+  { id: 'admin', label: '管理后台', icon: '⚙️' },
+]
+function switchTab(id) { activeTab.value = id }
 
 // ==================== 生命周期 ====================
 onMounted(async () => {
@@ -375,6 +442,35 @@ body {
   height: 100vh;
 }
 
+/* 主区域 + Tab */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Tab 导航栏 */
+.tab-bar {
+  display: flex;
+  gap: 2px;
+  padding: 0 16px;
+  background: var(--sb);
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  padding: 10px 18px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--sub);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all .2s;
+}
+.tab-btn:hover { color: #fff; }
+.tab-btn.active { color: #fff; border-bottom-color: var(--accent); }
+
 /* 聊天区容器 */
 .chat-area {
   flex: 1;
@@ -397,8 +493,53 @@ body {
   outline: none;
   margin-bottom: 12px;
 }
-.inp:focus {
-  border-color: var(--accent);
+.inp:focus { border-color: var(--accent); }
+.inp:disabled { opacity: 0.5; }
+
+/* Tab content */
+.tab-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Profile page */
+.profile-page {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 30px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+.profile-page h2 {
+  font-size: 22px;
+  color: #fff;
+  margin-bottom: 24px;
+}
+.pf-field { margin-bottom: 16px; }
+.pf-field label {
+  display: block;
+  font-size: 13px;
+  color: var(--sub);
+  margin-bottom: 6px;
+}
+.btn-primary {
+  padding: 10px 24px;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-outline {
+  padding: 10px 24px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--sub);
+  cursor: pointer;
+  font-size: 14px;
 }
 
 /* 错误提示（LoginPage 使用） */

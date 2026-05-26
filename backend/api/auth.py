@@ -162,3 +162,34 @@ async def update_profile(req: ProfileUpdate, token: str = ""):
     conn.commit()
     conn.close()
     return {"status": "ok"}
+
+
+# ===== 管理员验证 =====
+
+class AdminVerifyRequest(BaseModel):
+    password: str
+
+@router.post("/auth/admin-verify")
+async def admin_verify(req: AdminVerifyRequest):
+    """验证管理员密码（前端进入管理员面板时调用）"""
+    conn = get_connection()
+    admin = conn.execute("SELECT * FROM users WHERE role = 'admin' LIMIT 1").fetchone()
+    conn.close()
+    if not admin or not _verify_password(req.password, admin["password_hash"]):
+        raise HTTPException(401, "管理员密码错误")
+    return {"status": "ok", "role": "admin"}
+
+
+@router.put("/users/{user_id}/role")
+async def change_user_role(user_id: int, role: str = "user", token: str = ""):
+    """修改用户角色（管理员操作）"""
+    caller = _sessions.get(token)
+    if not caller or caller["role"] != "admin":
+        raise HTTPException(403, "需要管理员权限")
+    if role not in ("user", "admin"):
+        raise HTTPException(400, "无效的角色")
+    conn = get_connection()
+    conn.execute("UPDATE users SET role = ? WHERE id = ?", [role, user_id])
+    conn.commit()
+    conn.close()
+    return {"status": "ok"}

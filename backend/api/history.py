@@ -142,6 +142,21 @@ async def save_history(req: SaveHistoryRequest):
     return {"status": "ok"}
 
 
+@router.put("/history/{session_id}/rename")
+async def rename_history(session_id: str, title: str = ""):
+    """重命名会话"""
+    if not title.strip():
+        raise HTTPException(400, "标题不能为空")
+    conn = get_connection()
+    conn.execute(
+        "UPDATE conversations SET title = ?, updated_at = datetime('now') WHERE session_id = ?",
+        [title.strip(), session_id],
+    )
+    conn.commit()
+    conn.close()
+    return {"status": "ok", "session_id": session_id, "title": title.strip()}
+
+
 @router.delete("/history/batch")
 async def batch_delete_history(req: BatchDeleteRequest):
     """批量删除会话"""
