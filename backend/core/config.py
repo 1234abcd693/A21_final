@@ -38,7 +38,7 @@ class Settings:
     SQLITE_PATH: str = os.getenv("SQLITE_PATH", str(BASE_DIR / "data" / "feedbacks.db"))
 
     # Embedding
-    EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "BAAI/bge-base-zh-v1.5")
+    EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", str(PROJECT_ROOT / "model" / "bge-base-zh-v1.5"))
 
     # 参数
     PARAMS_PATH: str = os.getenv("PARAMS_PATH", str(BASE_DIR / "rag" / "params.json"))
