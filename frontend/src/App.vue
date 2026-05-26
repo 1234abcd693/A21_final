@@ -1,33 +1,54 @@
 <template>
-  <div v-if="v==='login'" class="app"><LoginView @login-success="onLogin"/></div>
-  <div v-else class="app"><TopBar :currentView="v" @search="onS" @nav="v=$event" @toggleChat="cv=!cv"/>
-    <div class="ma"><HistoryPanel v-if="v==='history'" @select="onH" @close="v='home'"/>
-      <div class="ga"><GraphPanel ref="gr" :highlight-nodes="hn" @node-click="onN"/></div>
-      <div class="da" v-if="v==='home'||v==='profile'||v==='admin'">
-        <DetailPanel v-if="v==='home'" :node="sn" @ask="onA"/>
-        <ProfileView v-if="v==='profile'" @logout="onL"/>
-        <AdminView v-if="v==='admin'"/>
-      </div></div>
-    <ChatPanel v-if="cv" @close="cv=false" @messageSent="onM"/></div>
+  <div v-if="v==='login'" class="login-page">
+    <div class="login-card">
+      <svg w="40" h="40" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="none" stroke="#002EA6" stroke-width="2.5"/><path d="M16 20 L24 14 L32 20 L28 20 L28 34 L20 34 L20 20 Z" fill="#FFE76F"/></svg>
+      <h1>A21 船舶故障诊断</h1>
+      <div class="f"><input v-model="u" placeholder="用户名" @keyup.enter="login"/></div>
+      <div class="f"><input v-model="p" type="password" placeholder="密码" @keyup.enter="login"/></div>
+      <button @click="login" :disabled="ld" class="btn">{{ld?'登录中…':'登 录'}}</button>
+      <p v-if="er" class="er">{{er}}</p>
+    </div>
+  </div>
+  <div v-else class="app">
+    <Sidebar :current="v" @nav="v=$event" @logout="v='login'" />
+    <div class="main">
+      <ChatView v-if="v==='chat'" />
+      <GraphView v-if="v==='graph'" @node-click="onN" />
+      <ProfileModal v-if="v==='profile'" @close="v='chat'" />
+    </div>
+  </div>
 </template>
+
 <script setup>
 import { ref } from 'vue'
-import TopBar from './components/TopBar.vue';import GraphPanel from './components/GraphPanel.vue';import DetailPanel from './components/DetailPanel.vue'
-import HistoryPanel from './components/HistoryPanel.vue';import ChatPanel from './components/ChatPanel.vue'
-import LoginView from './views/LoginView.vue';import ProfileView from './views/ProfileView.vue';import AdminView from './views/AdminView.vue'
-import { graphAPI, authAPI } from './api/index.js'
-const v=ref(localStorage.getItem('a21_token')?'home':'login'),cv=ref(false),hn=ref([]),sn=ref(null)
-if(localStorage.getItem('a21_token')){authAPI.me(localStorage.getItem('a21_token')).catch(()=>{const a=localStorage.getItem('a21_auto');if(a){const[u,p]=a.split(':');authAPI.login({username:u,password:p}).then(({data})=>{localStorage.setItem('a21_token',data.token);localStorage.setItem('a21_user',JSON.stringify(data.user))}).catch(()=>v.value='login')}else v.value='login'})}
-function onLogin(d){v.value='home'}
-function onL(){v.value='login'}
-function onS(q){graphAPI.search(q).then(({data})=>{hn.value=data.results?.map(r=>r.uid)||[]})}
-function onN(n){sn.value=n}
-function onA(){cv.value=true}
-function onH(s){v.value='home'}
-function onM(){}
+import Sidebar from './components/Sidebar.vue'
+import ChatView from './components/ChatView.vue'
+import GraphView from './components/GraphView.vue'
+import ProfileModal from './components/ProfileModal.vue'
+import { authAPI } from './api/index.js'
+
+const v=ref(localStorage.getItem('a21_token')?'chat':'login')
+const u=ref('admin'),p=ref(''),ld=ref(false),er=ref('')
+
+async function login(){
+  if(!u.value||!p.value){er.value='请输入用户名和密码';return}
+  ld.value=true;er.value=''
+  try{const{data}=await authAPI.login({username:u.value,password:p.value});localStorage.setItem('a21_token',data.token);localStorage.setItem('a21_user',JSON.stringify(data.user));v.value='chat'}catch(e){er.value='登录失败'}finally{ld.value=false}
+}
+
+function onN(n){}
 </script>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-.app{display:flex;flex-direction:column;height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#F5F7FA;color:#1A1A2E}
-.ma{display:flex;flex:1;overflow:hidden}.ga{flex:1;min-width:0}.da{width:380px;border-left:1px solid #E8ECF1;overflow-y:auto;background:#fff}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#FAFAFA;color:#1A1A2E}
+.app{display:flex;height:100vh;background:#FAFAFA}
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.login-page{display:flex;align-items:center;justify-content:center;height:100vh;background:#F5F5F5}
+.login-card{background:#fff;border-radius:16px;padding:48px 40px;width:380px;box-shadow:0 2px 20px rgba(0,0,0,0.06);text-align:center}
+.login-card svg{margin-bottom:20px}
+.login-card h1{font-size:20px;color:#1A1A2E;margin-bottom:28px;font-weight:600}
+.f{margin-bottom:14px}.f input{width:100%;padding:11px 14px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none}.f input:focus{border-color:#002EA6}
+.btn{width:100%;padding:12px;background:#002EA6;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-weight:500;margin-top:4px}.btn:disabled{opacity:.5}
+.er{color:#EF4444;margin-top:10px;font-size:13px}
 </style>

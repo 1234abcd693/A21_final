@@ -55,6 +55,7 @@ function startBackend() {
     cwd: resourcesPath,
     env: { ...process.env, NEO4J_PASSWORD: 'a21password' },
     stdio: 'pipe',
+    windowsHide: true,
   })
   backendProcess.stdout?.on('data', (data) => console.log(`[backend] ${data}`))
   backendProcess.stderr?.on('data', (data) => console.error(`[backend] ${data}`))
