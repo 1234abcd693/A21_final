@@ -12,7 +12,7 @@ import websockets
 from pathlib import Path
 
 # 模型路径
-MODEL_DIR = Path(os.getenv("VOSK_MODEL_DIR", str(Path(__file__).parent.parent.parent / "model" / "vosk-model-cn")))
+MODEL_DIR = Path(os.getenv("VOSK_MODEL_DIR", str(Path(__file__).parent.parent.parent / "model" / "vosk-model-small-cn-0.22")))
 SAMPLE_RATE = 16000
 
 model = None
