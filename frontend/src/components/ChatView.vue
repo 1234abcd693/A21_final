@@ -13,12 +13,16 @@
         <button @mousedown.prevent="startVoice" @mouseup.prevent="stopVoice" class="vb" title="按住说话">🎤</button>
         <button @click="send" :disabled="st||!tx.trim()" class="sb"><svg w="18" h="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button>
       </div>
+      <div class="tools">
+        <label class="upload-btn" title="上传文档抽取知识">📄<input type="file" accept=".docx,.pdf,.txt" @change="uploadDoc" style="display:none"/></label>
+      </div>
     </div>
   </div>
 </template>
 <script setup>
 import { ref, nextTick } from 'vue'
-import { askStream, transcribeAPI } from '../api/index.js'
+import { askStream, transcribeAPI, feedbackAPI } from '../api/index.js'
+import api from '../api/index.js'
 const msgs=ref([]),tx=ref(''),st=ref(false),stx=ref(''),ml=ref(null),ta=ref(null)
 function escapeHtml(s){return s.replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function renderMd(s){return s.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/### (.*)/g,'<h3>$1</h3>').replace(/\n/g,'<br>').replace(/\[(\d+)\]/g,'<sup class="cite">[$1]</sup>').replace(/^- (.*)/gm,'<li>$1</li>')}
@@ -37,6 +41,8 @@ async function send(){
 let recorder,chunks
 async function startVoice(){try{const s=await navigator.mediaDevices.getUserMedia({audio:true});recorder=new MediaRecorder(s);chunks=[];recorder.ondataavailable=e=>chunks.push(e.data);recorder.onstop=async()=>{const b=new Blob(chunks,{type:'audio/wav'});try{const{data}=await transcribeAPI.send(b);if(data.text)tx.value=data.text}catch{}};recorder.start()}catch{}}
 function stopVoice(){if(recorder?.state!=='inactive'){recorder.stop();recorder.stream.getTracks().forEach(t=>t.stop())}}
+async function uploadDoc(e){const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{const{data}=await api.post('/parse',fd,{headers:{'Content-Type':'multipart/form-data'}});tx.value=`请分析以下文档内容:\n${data.candidates?.map(c=>`- ${c.type}: ${c.name}`).join('\n')||'无提取结果'}`}catch{tx.value='文档上传失败'}}
+async function rate(msg,rating){const q=msgs.value.find(m=>m.role==='user'&&m.id<msg.id)?.content||'';try{await feedbackAPI.submit({message_id:msg.id+'',rating,question:q,answer_text:msg.content,retrieved_chunks:'[]'})}catch{}}
 function scroll(){nextTick(()=>{if(ml.value)ml.value.scrollTop=ml.value.scrollHeight})}
 </script>
 <style scoped>
