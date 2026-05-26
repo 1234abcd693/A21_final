@@ -21,7 +21,7 @@ timeout /t 10 /nobreak >nul
 
 REM 启动 whisper-server
 echo [3/6] 启动 Vosk 语音识别...
-start "Vosk" /D "%BASE%backend" cmd /c "call conda activate a21 && python tools\vosk_server.py"
+start "Vosk" /D "%BASE%backend" cmd /c "call conda activate a21 && python tools\vosk_http.py"
 echo       等待 Vosk 就绪 (5秒)...
 timeout /t 5 /nobreak >nul
 
@@ -40,7 +40,7 @@ echo  所有服务启动中...
 echo.
 echo   Neo4j:         http://localhost:7474
 echo   llama-server:  http://localhost:8082
-echo   Vosk语音:      ws://localhost:8765
+echo   Vosk语音:      http://localhost:8765
 echo   后端 API:       http://localhost:8000/docs
 echo   前端:           http://localhost:5173
 echo ========================================
