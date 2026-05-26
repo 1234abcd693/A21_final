@@ -38,3 +38,7 @@ diskcache==5.6.3
 
 # 配置管理
 python-dotenv==1.0.0
+
+# 语音识别 (Vosk WebSocket)
+vosk==0.3.45
+websockets==13.0

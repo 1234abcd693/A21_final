@@ -20,17 +20,18 @@ echo       等待 llama-server 就绪 (10秒)...
 timeout /t 10 /nobreak >nul
 
 REM 启动 whisper-server
-echo [3/5] 启动 whisper-server (端口 8081)...
-start "whisper-server" /D "%BASE%whisper.cpp\Release" cmd /c "whisper-server.exe -m %BASE%model\ggml-base.bin --host 127.0.0.1 --port 8081"
-timeout /t 3 /nobreak >nul
+echo [3/6] 启动 Vosk 语音识别...
+start "Vosk" /D "%BASE%backend" cmd /c "call conda activate a21 && python tools\vosk_server.py"
+echo       等待 Vosk 就绪 (5秒)...
+timeout /t 5 /nobreak >nul
 
 REM 启动 FastAPI 后端 (需要 conda 环境)
-echo [4/5] 启动后端 (端口 8000)...
+echo [4/6] 启动后端 (端口 8000)...
 start "FastAPI" /D "%BASE%backend" cmd /c "call conda activate a21 && uvicorn main:app --host 127.0.0.1 --port 8000"
 timeout /t 5 /nobreak >nul
 
 REM 启动前端
-echo [5/5] 启动前端 (端口 5173)...
+echo [5/6] 启动前端 (端口 5173)...
 start "Vue" /D "%BASE%frontend" cmd /c "npm run dev"
 
 echo.
@@ -39,7 +40,7 @@ echo  所有服务启动中...
 echo.
 echo   Neo4j:         http://localhost:7474
 echo   llama-server:  http://localhost:8082
-echo   whisper:       http://localhost:8081
+echo   Vosk语音:      ws://localhost:8765
 echo   后端 API:       http://localhost:8000/docs
 echo   前端:           http://localhost:5173
 echo ========================================
