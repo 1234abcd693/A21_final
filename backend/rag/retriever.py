@@ -40,18 +40,24 @@ def _ensure_bm25_index():
             corpus.append(list(jieba.cut(text)))
         if corpus:
             _bm25_index = BM25Okapi(corpus)
+        else:
+            _bm25_index = None  # 空库时设为 None
     except Exception:
-        _bm25_index = BM25Okapi([[""]])
+        _bm25_index = None
         _bm25_chunks = []
 
 
 def bm25_search(query: str, top_k: int = 5) -> list[dict[str, Any]]:
     """BM25 关键词检索"""
     _ensure_bm25_index()
+    if _bm25_index is None:
+        return []
     import jieba
     tokens = list(jieba.cut(query))
-    scores = _bm25_index.get_scores(tokens)
-    # 取 top_k
+    try:
+        scores = _bm25_index.get_scores(tokens)
+    except Exception:
+        return []
     ranked = sorted(enumerate(scores), key=lambda x: x[1], reverse=True)[:top_k]
     results = []
     for idx, score in ranked:

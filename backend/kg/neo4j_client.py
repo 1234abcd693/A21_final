@@ -191,7 +191,7 @@ def graph_search(query: str, uid: Optional[str] = None) -> list[dict[str, Any]]:
                    OR ANY(f IN s.primary_features WHERE f CONTAINS $query)
                 RETURN s.uid AS uid
                 LIMIT 3
-            """, query=query)
+            """, parameters={"query": query})
             symptoms = [dict(r) for r in result]
 
         all_results = []
