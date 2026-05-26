@@ -155,21 +155,21 @@ def expand_node(uid: str) -> dict[str, Any]:
 
 
 def get_overview() -> dict[str, Any]:
-    """获取图谱全貌（L2/L3 设备 + 顶级 Symptom）"""
+    """获取图谱全貌（所有节点 + 所有关系）"""
     with _get_driver().session() as session:
+        # 所有节点
         result = session.run("""
-            MATCH (e:Equipment)
-            RETURN e.uid AS uid, e.name AS name, 'Equipment' AS label, e.level AS level
-            UNION
-            MATCH (s:Symptom)
-            RETURN s.uid AS uid, s.name AS name, 'Symptom' AS label, 0 AS level
+            MATCH (n)
+            RETURN n.uid AS uid, n.name AS name, labels(n)[0] AS label,
+                   CASE WHEN n.level IS NOT NULL THEN n.level ELSE 0 END AS level
         """)
         nodes = [dict(r) for r in result]
 
+        # 所有关系
         result = session.run("""
-            MATCH (a)-[r:SUBCLASS_OF|BELONGS_TO]->(b)
-            RETURN a.uid AS `from`, b.uid AS `to`, type(r) AS type
-            LIMIT 50
+            MATCH (a)-[r]->(b)
+            RETURN a.uid AS `from`, b.uid AS `to`, type(r) AS type,
+                   r.priority AS priority
         """)
         edges = [dict(r) for r in result]
 
