@@ -82,6 +82,7 @@
 | 16:00 | AI | 验证 | symptoms 接口因 Neo4j 未启动失败（预期），SQLite 独立工作 |
 | 16:15 | AI | 分支 | 创建 `feat/graph-viz` 分支，开发知识图谱可视化增强 |
 | 16:15 | AI | 开发 | GraphPanel 增强: 双击展开/折叠邻居节点, 关系箭头+标签, 搜索脉冲动画, 缩放控件 |
+| 16:30 | AI | 重构 | GraphPanel 从 D3 迁移到 vis-network（forceAtlas2 物理引擎，节点自动散布，开箱即用） |
 
 ---
 
